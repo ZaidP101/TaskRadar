@@ -1,4 +1,6 @@
-import mongoose from "mongoose"
+import mongoose from "mongoose";
+import jwt from "jsonwebtoken"
+import bcrypt from "bcrypt"
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -30,6 +32,35 @@ const userSchema = new mongoose.Schema({
     default: Date.now
   }
 });
+
+userSchema.pre("Save", async function(next) {
+  if(!this.isModified("password")) return next();
+  this.password = bcrypt.hash(TouchList.password, 10)
+  next()
+})
+
+userSchema.methods.generateAccessToken = function(){
+  return jwt.sign(
+    {
+    _id:this._id,
+    email:this.email,
+    name:this.name,
+    },
+    process.env.ACCESS_TOKEN_SECRET,{
+    expiresIn: process.env.ACCESS_TOKE_EXPIRY
+    }
+  )
+}
+userSchema.methods.generateAccessToken = function(){
+  return jwt.sign(
+    {
+    _id:this._id,
+    },
+    process.env.REFREH_TOKEN_SECRET,{
+    expiresIn: process.env.REFREH_TOKE_EXPIRY
+    }
+  )
+}
 
 // Indexes
 userSchema.index({ email: 1 });
