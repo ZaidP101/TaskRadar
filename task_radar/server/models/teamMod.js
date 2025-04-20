@@ -5,7 +5,7 @@ const teamSchema = new mongoose.Schema({
     type: String,
     required: [true, "Team name is required"]
   },
-  teamLead: {
+  Admin: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true

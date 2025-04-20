@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema({
     minlength: 3,
     select: false
   },
-  isTeamLead: {
+  isAdmin: {
     type: Boolean,
     default: false
   },
@@ -30,12 +30,16 @@ const userSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now
+  }, 
+  avatar:{
+    type: String, //cloudinary
+    required:true,
   }
 });
 
 userSchema.pre("Save", async function(next) {
   if(!this.isModified("password")) return next();
-  this.password = bcrypt.hash(TouchList.password, 10)
+  this.password = await bcrypt.hash(this.password, 10)
   next()
 })
 
