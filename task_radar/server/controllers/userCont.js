@@ -3,6 +3,7 @@ import { ApiError} from "../utils/ApiErrors.js";
 import { User } from "../models/userMod.js";
 import { uploadCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import multer from "multer";
 
 
 const registerUser = asyncHandler(async (req, res)=>{
@@ -25,24 +26,34 @@ const registerUser = asyncHandler(async (req, res)=>{
     throw new ApiError(400, "User name or Email already exist")
    }
    console.log(req.file);
-   const avatarLocalPath = req.file.path;
-   if(!avatarLocalPath){
-    throw new ApiError(400, "Avatar file is required")
+
+
+   
+   // const upload = multer({storage})
+   const base64photo = req.file ? req.file.buffer.toString('base64'):null;
+   if(!base64photo){
+      throw new ApiError(400, "Avatar file is required")
    }
+
+  
+   // const avatarLocalPath = req.file ? req.file.path: null;
+   // if(!avatarLocalPath){
+   //  throw new ApiError(400, "Avatar file is required")
+   // }
 
    //upload on cloudinary
-   const avatar = await uploadCloudinary(avatarLocalPath)
+   // const avatar = await uploadCloudinary(avatarLocalPath)
 
-   if(!avatar){
-    throw new ApiError(400, "Avatar file is required")
-   }
+   // if(!avatar){
+   //  throw new ApiError(400, "Avatar file is required")
+   // }
 
    // dataBase entry
    const user = await User.create({
     name: name.toLowerCase(),
-    avatar: avatar.url,
     email,
-    password
+    password,
+    avatar: base64photo
    })
 
    const createdUser = await User.findById(user._id).select(
