@@ -34,6 +34,9 @@ const userSchema = new mongoose.Schema({
   avatar:{
     type: String, //cloudinary
     required: true
+  },
+  refreshToken:{
+    type: String
   }
 });
 
@@ -43,19 +46,23 @@ userSchema.pre("Save", async function(next) {
   next()
 })
 
+userSchema.method.isPasswordCorrect = async function (password){
+  return await bcrypt.compare(password, this.password)
+}
+
 userSchema.methods.generateAccessToken = function(){
   return jwt.sign(
     {
-    _id:this._id,
-    email:this.email,
-    name:this.name,
+    _id: this._id,
+    email: this.email,
+    name: this.name,
     },
     process.env.ACCESS_TOKEN_SECRET,{
     expiresIn: process.env.ACCESS_TOKE_EXPIRY
     }
   )
 }
-userSchema.methods.generateAccessToken = function(){
+userSchema.methods.generateRefreshToken = function(){
   return jwt.sign(
     {
     _id:this._id,
