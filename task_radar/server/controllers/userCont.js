@@ -161,7 +161,7 @@ const refreshAccesssToken = asyncHandler(async(req, res)=>{
       const decodedToken = jwt.verify(incomingRefreshToken, 
          process.env.REFRESH_TOKEN_SECRET
       )
-      const user = User.findById(decodedToken?._id)
+      const user = await User.findById(decodedToken?._id)
       if(!user){
          throw new ApiError(401, "Invalid referesh token")
       }
@@ -209,27 +209,27 @@ const changeCurrentPassword = asyncHandler(async(req, res)=>{
 const getCurrentUser = asyncHandler(async(req, res)=>{
    return res
    .status(200)
-   .json(200, req.user, "current users fetched succefully")
+   .json(new ApiResponse(200, req.user, "current users fetched succefully"))
 })
 
 const updateAccountDetails = asyncHandler(async(req, res)=>{
    const {name, email, } = req.body
    if(!name || !email){
       throw new ApiError(400, "All feilds are required")
-
-      const user = User.findByIdAndUpdate(req.user?._id,
-         {
-            $set:{
-               name,
-               email
-            }
-         },
-         {new : true} 
-   
-      ).select("-password")
-      return res.status(200)
-      .json(200, user, "Account details updated successfullt")
    }
+   const user = await User.findByIdAndUpdate(req.user?._id,
+      {
+         $set:{
+            name,
+            email
+         }
+      },
+      {new : true} 
+   
+   ).select("-password")
+   return res.status(200)
+   .json(200, user, "Account details updated successfullt")
+   
 })
 
 const updateAvatar = asyncHandler(async (req, res) => {
@@ -242,7 +242,9 @@ const updateAvatar = asyncHandler(async (req, res) => {
    // Update user's avatar
    const updatedUser = await User.findByIdAndUpdate(
      req.user._id,
-     { avatar: base64photo },
+      { 
+         $set:{avatar: base64photo}
+      },
      { new: true }
    ).select("-password -refreshToken");
  
@@ -253,7 +255,7 @@ const updateAvatar = asyncHandler(async (req, res) => {
    return res.status(200).json(
      new ApiResponse(200, updatedUser, "Avatar updated successfully")
    );
- });
+});
 
 
  
@@ -266,6 +268,4 @@ export {
    getCurrentUser,
    updateAccountDetails,
    updateAvatar,
-
-
 };

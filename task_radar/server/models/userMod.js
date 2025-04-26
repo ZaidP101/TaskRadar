@@ -23,9 +23,9 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  teams: [{
+  assignProject: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Team'
+    ref: 'Project'
   }],
   createdAt: {
     type: Date,

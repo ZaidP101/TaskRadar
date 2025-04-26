@@ -6,11 +6,10 @@ const projectSchema = new mongoose.Schema({
     required: [true, "Project name is required"]
   },
   description: String,
-  team: {
+  employees:[{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Team',
-    required: true
-  },
+    ref:'User'
+  }],
   tasks: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Task'

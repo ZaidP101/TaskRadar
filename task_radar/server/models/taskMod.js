@@ -44,6 +44,12 @@ const taskSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now
+  },
+
+  status:{
+    type: String,
+    enum:['ongoing', 'completed'],
+    default:'ongoing'
   }
 });
 

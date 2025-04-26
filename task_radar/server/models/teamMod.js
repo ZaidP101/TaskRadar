@@ -1,3 +1,5 @@
+// Currently not in use
+
 import mongoose from "mongoose";
 
 const teamSchema = new mongoose.Schema({

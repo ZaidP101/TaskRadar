@@ -15,11 +15,11 @@ const invitationSchema = new mongoose.Schema({
     enum: ['pending', 'accepted', 'expired'],
     default: 'pending'
   },
-  team: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Team',
-    required: true
-  },
+  // team: {
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   ref: 'Team',
+  //   required: true
+  // },
   invitedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
