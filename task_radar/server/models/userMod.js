@@ -23,10 +23,17 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  assignProject: [{
+  assignProjects: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Project'
+    ref: 'Project',
+    default: null
   }],
+
+  status:{
+    type: String,
+    enum: ["free", "busy"],
+    default:"free"
+  },
   createdAt: {
     type: Date,
     default: Date.now
