@@ -19,7 +19,8 @@ const createProject = asyncHandler(async(req, res)=>{
     const project = await Project.create({
         name,
         description,
-        createdBy: req.user._id
+        createdBy: req.user._id,
+        employees: employees
     });
 
     for (let empId of employees) {
@@ -29,14 +30,19 @@ const createProject = asyncHandler(async(req, res)=>{
           throw new ApiError(404, `Employee with ID ${empId} not found`);
         }
         
-        if (employee.assignProjects) {
+        if (employee.assignProjects.includes(project._id)) {
             throw new ApiError(400, `Employee ${employee.name} is already assigned to a project.`);
         }
-        employee.assignProjects = project._id;
+        if (!employee.assignProjects.includes(project._id)) {
+            employee.assignProjects.push(project._id);
+        }        
         employee.status = "busy";
         await employee.save();
     }
-
+    
+    project.employees = employees;
+    await project.save();
+    
     res.status(201).json({
         success: true,
         message: "Project created and employees assigned successfully",
@@ -71,6 +77,49 @@ const projectCompleted = asyncHandler(async(req, res)=>{
     .json( new ApiResponse(200, {}, "Project marked as completed successfully"))
 })
 
+const addEmployeesToProject = asyncHandler(async (req, res) => {
+    const { projectId, employees } = req.body;
+
+    if (!projectId || !employees || employees.length === 0) {
+        throw new ApiError(400, "Project ID and at least one employee ID are required.");
+    }
+
+    if (!req.user.isAdmin) {
+        throw new ApiError(403, "Only Admins can add employees to a project.");
+    }
+
+    const project = await Project.findById(projectId);
+    if (!project) {
+        throw new ApiError(404, "Project not found.");
+    }
+
+    for (let empId of employees) {
+        const employee = await User.findById(empId);
+        if (!employee) {
+            throw new ApiError(404, `Employee with ID ${empId} not found.`);
+        }
+
+        if (employee.assignProjects.includes(project._id)) {
+            throw new ApiError(400, `Employee ${employee.name} is already assigned to this project.`);
+        }
+        
+
+        employee.assignProjects.push(project._id);
+        employee.status = "busy";
+        await employee.save();
+
+        // Add to project only if not already included
+        if (!project.employees.includes(empId)) {
+            project.employees.push(empId);
+        }
+    }
+
+    await project.save();
+
+    res.status(200).json(new ApiResponse(200, project, "Employees added to project successfully."));
+});
+
+
 const rmEmpFromColpltedProj = asyncHandler(async(req, res)=>{
     const {projectId} = req.body;
 
@@ -100,5 +149,6 @@ const rmEmpFromColpltedProj = asyncHandler(async(req, res)=>{
 export {
     createProject,
     projectCompleted,
-    rmEmpFromColpltedProj
+    rmEmpFromColpltedProj,
+    addEmployeesToProject
 }

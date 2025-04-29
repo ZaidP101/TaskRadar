@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { 
+    addEmployeesToProject,
     createProject, 
     projectCompleted,
     rmEmpFromColpltedProj 
@@ -17,4 +18,6 @@ router.route("/completed")
 router.route("/remove-employees")
 .post(verifyJWT, rmEmpFromColpltedProj)
 
+router.route("/add-employees")
+.post(verifyJWT, addEmployeesToProject)
 export default router

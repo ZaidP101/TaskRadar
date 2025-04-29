@@ -45,12 +45,6 @@ const taskSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
-
-  status:{
-    type: String,
-    enum:['ongoing', 'completed'],
-    default:'ongoing'
-  }
 });
 
 // Indexes for quick querying

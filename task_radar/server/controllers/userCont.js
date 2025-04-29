@@ -23,7 +23,7 @@ const genAccAndRefTokens = async(userId)=>{
 
 
 const registerUser = asyncHandler(async (req, res)=>{
-   const {name, email, password} = req.body
+   const {name, email, password, isAdmin} = req.body
    console.log(name, "\n", email, "\n",  password,);
 
    if(
@@ -69,7 +69,8 @@ const registerUser = asyncHandler(async (req, res)=>{
     name: name.toLowerCase(),
     email,
     password,
-    avatar: base64photo
+    avatar: base64photo,
+    isAdmin : isAdmin==="true"
    })
 
    const createdUser = await User.findById(user._id).select(
