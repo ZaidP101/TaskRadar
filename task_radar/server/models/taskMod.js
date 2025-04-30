@@ -27,7 +27,7 @@ const taskSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['todo', 'in-progress', 'paused', 'ready-for-review', 'completed'],
+    enum: ['todo', 'in-progress', 'paused', 'resume', 'ready-for-review', 'completed'],
     default: 'todo'
   },
   priority: {
@@ -36,11 +36,18 @@ const taskSchema = new mongoose.Schema({
     default: 'medium'
   },
   timeLogs: [{
-    startTime: Date,
-    endTime: Date,
-    duration: Number, 
-    pauseReason: String
+    start: Date,
+    end: Date,
+    pauseReason: {
+      type: String,
+      enum: ['system error', 'break', 'shift ended', 'meeting', null], // null for active sessions
+      default: null
+    }
   }],
+  totalTimeSpent: {
+    type: Number,
+    default: 0
+  },
   createdAt: {
     type: Date,
     default: Date.now

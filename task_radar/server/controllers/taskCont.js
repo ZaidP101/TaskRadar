@@ -1,4 +1,4 @@
-import { Task } from "../models/taskModel.js";
+import { Task } from "../models/taskMod.js";
 import { User } from "../models/userMod.js";
 import { Project } from "../models/projectMod.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
@@ -41,28 +41,66 @@ const getTasksByProject = asyncHandler(async (req, res) => {
 });
 
 
-const getTasksByEmployee = asyncHandler(async (req, res) => {
-  const { employeeId } = req.params;
+const getEmployeesByProject = asyncHandler(async (req, res) => {
+  const { projectId } = req.params;
 
-  const tasks = await Task.find({ assignedTo: employeeId }).populate("project", "name").exec();
-  res.status(200).json(new ApiResponse(200, tasks, "Tasks fetched for employee."));
+  const project = await Project.findById(projectId).populate("employees", "name email");
+  if (!project) {
+    throw new ApiError(404, "Project not found.");
+  }
+
+  res.status(200).json(new ApiResponse(200, project.employees, "Employees fetched for this project."));
 });
+
 
 
 const updateTaskStatus = asyncHandler(async (req, res) => {
   const { taskId } = req.params;
-  const { status } = req.body;
+  const { status, pauseReason } = req.body;
 
-  const validStatus = ['todo', 'in-progress', 'paused', 'ready-for-review', 'completed'];
+  const validStatus = ['todo', 'in-progress', 'paused', 'resume', 'ready-for-review', 'completed'];
   if (!validStatus.includes(status)) {
     throw new ApiError(400, "Invalid task status.");
   }
 
-  const task = await Task.findByIdAndUpdate(taskId, { status }, { new: true });
-  if (!task) throw new ApiError(404, "Task not found.");
+  const task = await Task.findById(taskId);
+  if (!task) {
+    throw new ApiError(404, "Task not found.");
+  }
 
-  res.status(200).json(new ApiResponse(200, task, "Task status updated."));
+  const now = new Date();
+
+  // Start timer if 
+  if (status === 'in-progress' || status === 'resume') {
+    task.timeLogs.push({ start: now });
+  }
+
+  // Stop timer 
+  else if (['paused', 'ready-for-review', 'completed'].includes(status)) {
+    const lastLog = task.timeLogs[task.timeLogs.length - 1];
+    if (lastLog && !lastLog.end) {
+      lastLog.end = now;
+
+      const sessionTime = now - new Date(lastLog.start);
+      task.totalTimeSpent += sessionTime;
+
+      if (status === 'paused') {
+        if (!pauseReason) {
+          throw new ApiError(400, "Pause reason is required when pausing a task.");
+        }
+
+        lastLog.pauseReason = pauseReason;
+      }
+    }
+  }
+
+  task.status = status;
+  await task.save();
+
+  res.status(200).json(new ApiResponse(200, task, `Task status updated to ${status}.`));
 });
+
+
 
 
 const deleteTask = asyncHandler(async (req, res) => {
@@ -77,7 +115,7 @@ const deleteTask = asyncHandler(async (req, res) => {
 export {
   createTask,
   getTasksByProject,
-  getTasksByEmployee,
+  getEmployeesByProject,
   updateTaskStatus,
   deleteTask
 };
