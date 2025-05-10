@@ -36,7 +36,7 @@ function Signup() {
     data.append('isAdmin', formData.isAdmin);
 
     try {
-      await axios.post('http://localhost:3000/api/users/register', data, {
+      await axios.post('http://localhost:3000/api/user/register', data, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
@@ -77,27 +77,34 @@ function Signup() {
             onChange={handleChange}
             className="login-input"
           />
+          <label htmlFor="avatar" className="custom-file-upload">
+            Upload Avatar
+          </label>
           <input
+            id="avatar"
             type="file"
             name="avatar"
             onChange={handleChange}
-            className="login-input"
+            className="file-input-hidden"
           />
-          <label>
-            <input
-              type="checkbox"
-              name="isAdmin"
-              checked={formData.isAdmin}
-              onChange={handleChange}
-            />
-            {' '}Register as Admin
-          </label>
+          
+          <div className="form-group">
+            <label>
+              <input
+                type="checkbox"
+                name="isAdmin"
+                checked={formData.isAdmin}
+                onChange={handleChange}
+              />
+              {' '}Register as Admin
+            </label>
+          </div>
           <button type="submit" className="login-button" style={{ width: '100%', marginTop: '15px' }}>
             Signup
           </button>
         </form>
         <p style={{ marginTop: '10px', textAlign: 'center' }}>
-          Already have an account? <a href="/login">Login</a>
+          Already have an account? <a href="/login" style={{ color: '#0077ff', textDecoration: 'none' }}>Login</a>
         </p>
       </div>
     </div>

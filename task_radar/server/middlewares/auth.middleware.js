@@ -24,3 +24,10 @@ export const verifyJWT = asyncHandler(async(req, res, next)=>{
         throw new ApiError(400, error?.message || "Invalid Access Token ")
     }
 })
+
+export const verifyAdmin = (req, res, next) => {
+    if (!req.user?.isAdmin) {
+        throw new ApiError(403, "Forbidden: Admin access only");
+    }
+    next();
+};

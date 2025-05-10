@@ -5,28 +5,34 @@ import axios from './axios.js';
 import React from 'react';
 
 
-
 function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [loading, setLoading] = useState(false); // optional: loading state
 
   const handleLogin = async () => {
+    setLoading(true);
     try {
-      const response = await axios.post('http://localhost:3000/api/users/login', {
-        email,
-        password,
-        isAdmin,
-      },{
-        withCredentials: true,
-      });
+      const response = await axios.post(
+        'http://localhost:3000/api/auth/login',
+        { email, password },
+        { withCredentials: true }
+      );
 
+      const { isAdmin } = response?.data?.data?.user || {};
+      if (isAdmin === undefined) {
+      throw new Error("User data is missing in response.");
+      }
       alert(`Welcome, ${email}!`);
+      
+      // Route based on admin flag
       navigate(isAdmin ? '/adminDash' : '/userDash');
     } catch (error) {
       console.error(error);
-      alert('Login failed!');
+      alert('Login failed! ' + (error?.response?.data?.message || 'Please try again.'));
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -48,18 +54,11 @@ function Login() {
           onChange={(e) => setPassword(e.target.value)}
           className="login-input"
         />
-        <label>
-          <input
-            type="checkbox"
-            checked={isAdmin}
-            onChange={() => setIsAdmin(!isAdmin)}
-          /> Login as Admin
-        </label>
-        <button onClick={handleLogin} className="login-button">
-          Login
+        <button onClick={handleLogin} className="login-button" disabled={loading}>
+          {loading ? 'Logging in...' : 'Login'}
         </button>
         <p style={{ marginTop: '10px' }}>
-          Don’t have an account? <a href="/signup">      Signup</a>
+          Don’t have an account? <a href="/signup" style={{ color: '#0077ff', textDecoration: 'none' }}>Signup</a>
         </p>
       </div>
     </div>

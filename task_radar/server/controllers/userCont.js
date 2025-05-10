@@ -87,45 +87,60 @@ const registerUser = asyncHandler(async (req, res)=>{
 });
 
 const loginUser = asyncHandler(async(req, res)=>{
-   const {name, email, password} = req.body
-   console.log(email);
-
-   if(!name && !email){
-      throw new ApiError(400, "User Name or Email is required")
+   try {
+      const { email, password } = req.body;
+      console.log("Email:", email);
+   
+      if (!email || !password) {
+      throw new ApiError(400, "Email and Password are required");
    }
-   const user = await User.findOne({
-      $or: [{email}, {name}]
-   }).select("+password");
-   if(!user){
-      throw new ApiError(400, "User does not exist !!")
+   
+   const user = await User.findOne({ email }).select("+password");
+
+   
+      if(!user){
+         throw new ApiError(400, "User does not exist !!")
+      }
+   
+      const isPasswordCorrect = await user.isPasswordCorrect(password);
+   
+      if(!isPasswordCorrect){
+         throw new ApiError(400, "Incorrect Password!!")
+      }
+   
+      const {accessToken, refreshToken} = await genAccAndRefTokens(user._id)
+   
+      const loggedinUser = await User.findById(user._id).select("-password -refreshToken")
+   
+      const Options ={
+         httpOnly: true,
+         secure: true
+      }
+   
+      return res
+  .status(200)
+  .cookie("accessToken", accessToken, Options)
+  .cookie("refreshToken", refreshToken, Options)
+  .json(
+    new ApiResponse(
+      200,
+      {
+        user: {
+          _id: loggedinUser._id,
+          email: loggedinUser.email,
+          isAdmin: loggedinUser.isAdmin,
+        },
+        accessToken,
+        refreshToken,
+      },
+      "User logged in successfully!"
+    )
+  );
+
+   } catch (error) {
+      console.error("Login error:", error); // Log detailed error
+    throw new ApiError(500, "Internal Server Error");
    }
-
-   const isPasswordCorrect = await user.isPasswordCorrect(password);
-
-   if(!isPasswordCorrect){
-      throw new ApiError(400, "Incorrect Password!!")
-   }
-
-   const {accessToken, refreshToken} = await genAccAndRefTokens(user._id)
-
-   const loggedinUser = await User.findById(user._id).select("-password -refreshToken")
-
-   const Options ={
-      httpOnly: true,
-      secure: true
-   }
-
-   return res.status(200)
-   .cookie("accessToken", accessToken, Options)
-   .cookie("refreshToken", refreshToken, Options)
-   .json(
-      new ApiResponse(
-         200, {
-            user: loggedinUser, accessToken, refreshToken
-         },
-         "user Logged in Successfully !!"
-      )
-   )
 });
 
 const logoutUser = asyncHandler(async(req,res)=>{

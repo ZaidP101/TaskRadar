@@ -16,13 +16,17 @@ app.use(cookieParser())
 
 
 // routes import
-import userRouter from "./routes/userRou.js"
+import authRouter from "./routes/authRou.js";
+import userRouter from "./routes/userRou.js";
+import adminRouter from "./routes/adminRou.js";
 import projectRoutes from "./routes/projectRou.js"
 import taskRoutes from "./routes/taskRou.js"
 
 
 //routes declaration
-app.use("/api/users", userRouter)
+app.use("/api/auth", authRouter);
+app.use("/api/user", userRouter);
+app.use("/api/admin", adminRouter);
 app.use("/api/project", projectRoutes);
 app.use("/api/task", taskRoutes);
 
