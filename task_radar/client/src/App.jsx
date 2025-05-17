@@ -4,7 +4,10 @@ import Signup from './signin.jsx';
 import AdminDash from './adminDash.jsx';
 import UserDash from './userDash.jsx';
 import axios from './axios.js';
-import Test from './test.js';
+import Home from './home/Home.js';
+import AboutPage from './home/About.js';
+import FaqPage from './home/FAQ.js';
+import BlogPage from './home/Blog.js';
 
 function App() {
   return (
@@ -14,7 +17,13 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/adminDash" element={<AdminDash />} />
         <Route path="/userDash" element={<UserDash />} />
-        <Route path="/test" element={<Test />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/About" element={<AboutPage />} />
+        <Route path="/FAQ" element={<FaqPage />} />
+        <Route path="/Blog" element={<BlogPage />} />
+
+
+
       </Routes>
     </Router>
   );
