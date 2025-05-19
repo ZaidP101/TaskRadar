@@ -41,7 +41,7 @@ function Signup() {
       });
 
       alert('Registration successful!');
-      navigate(formData.isAdmin ? '/adminDash' : '/userDash');
+      navigate(formData.isAdmin ? '/adminDash' : '/empDash');
     } catch (error) {
       console.error(error);
       alert('Registration failed!');

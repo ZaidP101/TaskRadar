@@ -27,7 +27,7 @@ function Login() {
       alert(`Welcome, ${email}!`);
       
       // Route based on admin flag
-      navigate(isAdmin ? '/adminDash' : '/userDash');
+      navigate(isAdmin ? '/adminDash' : '/empDash');
     } catch (error) {
       console.error(error);
       alert('Login failed! ' + (error?.response?.data?.message || 'Please try again.'));

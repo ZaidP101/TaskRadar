@@ -23,11 +23,11 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  assignProjects: [{
+  assignProjects: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Project',
     default: null
-  }],
+  },
 
   status:{
     type: String,

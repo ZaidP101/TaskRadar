@@ -110,7 +110,8 @@ const loginUser = asyncHandler(async(req, res)=>{
    
       const {accessToken, refreshToken} = await genAccAndRefTokens(user._id)
    
-      const loggedinUser = await User.findById(user._id).select("-password -refreshToken")
+      const loggedinUser = await User.findById(user._id).select("-password -refreshToken").populate("assignProjects");
+      // .populate("project");
    
       const Options ={
          httpOnly: true,
@@ -129,6 +130,7 @@ const loginUser = asyncHandler(async(req, res)=>{
           _id: loggedinUser._id,
           email: loggedinUser.email,
           isAdmin: loggedinUser.isAdmin,
+           project: loggedinUser.assignProjects?._id || null,
         },
         accessToken,
         refreshToken,
