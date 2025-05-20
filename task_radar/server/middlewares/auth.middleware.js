@@ -6,9 +6,9 @@ import { User } from "../models/userMod.js";
 
 export const verifyJWT = asyncHandler(async(req, res, next)=>{
     try {
-        const token = req.cookies?.accessToken || req.header ("Authorization")?.replace("Bearer", "")
+        const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "").trim();
         if(!token){
-            throw new ApiError(401, "Unauthoized request")
+            throw new ApiError(401, "Unauthorized request")
         }
     
         const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
@@ -18,8 +18,12 @@ export const verifyJWT = asyncHandler(async(req, res, next)=>{
             throw new ApiError(401, "Invalid Access Token ")
         }
     
+        // console.log("Decoded token:", decodedToken);
+        // console.log("User found:", user);
         req.user = user;
         next()
+        
+
     } catch (error) {
         throw new ApiError(400, error?.message || "Invalid Access Token ")
     }

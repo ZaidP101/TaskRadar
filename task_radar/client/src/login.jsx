@@ -20,14 +20,14 @@ function Login() {
         { withCredentials: true }
       );
 
-      const { isAdmin } = response?.data?.data?.user || {};
+      const { isAdmin, project } = response?.data?.data?.user || {};
       if (isAdmin === undefined) {
       throw new Error("User data is missing in response.");
       }
       alert(`Welcome, ${email}!`);
       
       // Route based on admin flag
-      navigate(isAdmin ? '/adminDash' : '/empDash');
+      navigate(isAdmin ? '/adminDash' : `/empDash/${project}`);
     } catch (error) {
       console.error(error);
       alert('Login failed! ' + (error?.response?.data?.message || 'Please try again.'));

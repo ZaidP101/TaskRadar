@@ -1,8 +1,10 @@
 import { Router } from "express";
 import { verifyJWT, verifyAdmin } from "../middlewares/auth.middleware.js";
+import { loginUser } from "../controllers/userCont.js"
 
 const router = Router();
 
+router.post("/", loginUser);
 router.use(verifyJWT, verifyAdmin);
 
 

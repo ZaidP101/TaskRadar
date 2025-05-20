@@ -5,15 +5,15 @@ import { User } from "../models/userMod.js"
 import { ApiResponse } from "../utils/ApiResponse.js";
 
 
-const createProject = asyncHandler(async(req, res)=>{
-    const {name, employees, description} = req.body;
+const createProject = asyncHandler(async (req, res) => {
+    const { name, employees, description } = req.body;
 
-    if(!name || !employees || employees.length===0){
-        throw new ApiError(400, "Project name and at least one employee is required.")
+    if (!name || !employees || employees.length === 0) {
+        throw new ApiError(400, "Project name and at least one employee is required.");
     }
 
-    if(!req.user.isAdmin){
-        throw new ApiError(403, "Only Admins can create projects.")
+    if (!req.user.isAdmin) {
+        throw new ApiError(403, "Only Admins can create projects.");
     }
 
     const project = await Project.create({
@@ -25,30 +25,32 @@ const createProject = asyncHandler(async(req, res)=>{
 
     for (let empId of employees) {
         const employee = await User.findById(empId);
-    
+
         if (!employee) {
-          throw new ApiError(404, `Employee with ID ${empId} not found`);
+            throw new ApiError(404, `Employee with ID ${empId} not found`);
         }
-        
-        if (employee.assignProjects.includes(project._id)) {
+
+        // If employee is already assigned to another project
+        if (employee.assignProjects !== null) {
             throw new ApiError(400, `Employee ${employee.name} is already assigned to a project.`);
         }
-        if (!employee.assignProjects.includes(project._id)) {
-            employee.assignProjects.push(project._id);
-        }        
+
+        // Assign project to employee
+        employee.assignProjects = project._id;
         employee.status = "busy";
         await employee.save();
     }
-    
+
     project.employees = employees;
     await project.save();
-    
+
     res.status(201).json({
         success: true,
         message: "Project created and employees assigned successfully",
         project
     });
-})
+});
+
 
 const projectCompleted = asyncHandler(async(req, res)=>{
     const { projectId } = req.body;
