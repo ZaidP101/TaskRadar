@@ -48,11 +48,29 @@ const taskSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  startedAt: Date,
+  completedAt: Date,
+  
   createdAt: {
     type: Date,
     default: Date.now
   },
 });
+
+// time left until deadline (in hours)
+taskSchema.virtual('timeLeftHours').get(function () {
+  const now = new Date();
+  const diff = this.deadline - now;
+  return diff > 0 ? Math.floor(diff / (1000 * 60 * 60)) : 0;
+});
+
+// total time spent in hours
+taskSchema.virtual('totalTimeHours').get(function () {
+  return Math.floor(this.totalTimeSpent / (1000 * 60 * 60));
+});
+
+taskSchema.set('toJSON', { virtuals: true });
+taskSchema.set('toObject', { virtuals: true });
 
 // Indexes for quick querying
 taskSchema.index({ assignedTo: 1 });

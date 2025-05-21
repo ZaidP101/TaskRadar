@@ -7,6 +7,9 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 
 
 const createTask = asyncHandler(async (req, res) => {
+  if (!req.user.isAdmin) {
+    throw new ApiError(403, "Only Admin can create tasks.");
+  }
   const { title, description, project, assignedTo, deadline, priority } = req.body;
 
   if (!title || !project || !assignedTo || !deadline) {
@@ -39,7 +42,10 @@ const createTask = asyncHandler(async (req, res) => {
 const getTasksByProject = asyncHandler(async (req, res) => {
   const { projectId } = req.params;
 
-  const tasks = await Task.find({ project: projectId }).populate("assignedTo", "name email").exec();
+  const tasks = await Task.find({ project: projectId })
+  .populate("assignedTo", "name email")
+  .populate("assignedBy", "name email")
+  .exec();
   res.status(200).json(new ApiResponse(200, tasks, "Tasks fetched for project."));
 });
 
@@ -76,6 +82,8 @@ const updateTaskStatus = asyncHandler(async (req, res) => {
   // Start timer if 
   if (status === 'in-progress' || status === 'resume') {
     task.timeLogs.push({ start: now });
+
+    if (!task.startedAt) task.startedAt = now;
   }
 
   // Stop timer 
@@ -91,13 +99,19 @@ const updateTaskStatus = asyncHandler(async (req, res) => {
         if (!pauseReason) {
           throw new ApiError(400, "Pause reason is required when pausing a task.");
         }
-
         lastLog.pauseReason = pauseReason;
+        task.pauseReason = pauseReason;
+      }
+      if (status === 'completed') {
+        task.completedAt = now;
       }
     }
   }
 
   task.status = status;
+  if (status !== 'paused') {
+    task.pauseReason = "-"; // or null
+  }
   await task.save();
 
   res.status(200).json(new ApiResponse(200, task, `Task status updated to ${status}.`));
@@ -107,6 +121,9 @@ const updateTaskStatus = asyncHandler(async (req, res) => {
 
 
 const deleteTask = asyncHandler(async (req, res) => {
+  if (!req.user.isAdmin) {
+    throw new ApiError(403, "Only Admin can delete tasks.");
+  }
   const { taskId } = req.params;
 
   const task = await Task.findByIdAndDelete(taskId);
