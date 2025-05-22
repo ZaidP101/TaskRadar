@@ -9,6 +9,7 @@ import AboutPage from './home/About.js';
 import FaqPage from './home/FAQ.js';
 import BlogPage from './home/Blog.js';
 
+
 function App() {
   return (
     <Router>
@@ -21,6 +22,10 @@ function App() {
         <Route path="/About" element={<AboutPage />} />
         <Route path="/FAQ" element={<FaqPage />} />
         <Route path="/Blog" element={<BlogPage />} />
+        {/* <Route path="/update-avatar" element={<UpdateAvatar />} />
+        <Route path="/update-account" element={<UpdateAccount />} />
+        <Route path="/change-password" element={<ChangePassword />} /> */}
+
         
       </Routes>
     </Router>
