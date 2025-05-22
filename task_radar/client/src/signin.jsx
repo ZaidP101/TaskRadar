@@ -49,7 +49,7 @@ function Signup() {
   };
 
   return (
-    <div className="login-wrapper">
+    <div className="login-wrapper" style={{backgroundColor: "#070000"}}>
       <div className="login-container">
         <h2 className="login-title">Signup</h2>
         <form onSubmit={handleSubmit} encType="multipart/form-data">
@@ -88,7 +88,7 @@ function Signup() {
             className="file-input-hidden"
           />
           
-          <div className="form-group">
+          <div className="form-group" style={{  color: '#ffffff' }}>
             <label>
               <input
                 type="checkbox"
@@ -103,7 +103,7 @@ function Signup() {
             Signup
           </button>
         </form>
-        <p style={{ marginTop: '10px', textAlign: 'center' }}>
+        <p style={{ marginTop: '10px', textAlign: 'center', color: '#ffffff' }}>
           Already have an account? <a href="/login" style={{ color: '#0077ff', textDecoration: 'none' }}>Login</a>
         </p>
       </div>

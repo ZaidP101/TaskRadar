@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './App.css';
+// import './App.css';
 import axios from './axios.js';
 import React from 'react';
+
 
 
 function Login() {
@@ -20,14 +21,20 @@ function Login() {
         { withCredentials: true }
       );
 
-      const { isAdmin, project } = response?.data?.data?.user || {};
+      const { name, email: emailFromDB, isAdmin, project, status } = response?.data?.data?.user || {};
       if (isAdmin === undefined) {
       throw new Error("User data is missing in response.");
       }
-      alert(`Welcome, ${email}!`);
-      
+      alert(`Welcome, ${emailFromDB}!, Name: ${name}, Status: ${status}`);
+      console.log()
       // Route based on admin flag
-      navigate(isAdmin ? '/adminDash' : `/empDash/${project}`);
+      navigate(isAdmin ? '/adminDash' : `/empDash/${project}`, {
+      state: {
+          name: name, // Pass the user's name
+          email: emailFromDB, // Pass the email
+          status: status, // Pass the status
+  },
+      });
     } catch (error) {
       console.error(error);
       alert('Login failed! ' + (error?.response?.data?.message || 'Please try again.'));
@@ -37,7 +44,7 @@ function Login() {
   };
 
   return (
-    <div className="login-wrapper">
+    <div className="login-wrapper" style={{backgroundColor: "#070000"}}>
       <div className="login-container">
         <h2 className="login-title">Login</h2>
         <input
@@ -57,7 +64,7 @@ function Login() {
         <button onClick={handleLogin} className="login-button" disabled={loading}>
           {loading ? 'Logging in...' : 'Login'}
         </button>
-        <p style={{ marginTop: '10px' }}>
+        <p style={{ marginTop: '10px', color: "#ffffff" }}>
           Don’t have an account? <a href="/signup" style={{ color: '#0077ff', textDecoration: 'none' }}>Signup</a>
         </p>
       </div>

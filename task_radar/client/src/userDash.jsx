@@ -1,8 +1,25 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import axios from "./axios";
-import { useNavigate } from "react-router-dom";
-
+import {
+  Box,
+  Text,
+  Heading,
+  Select,
+  SimpleGrid,
+  Badge,
+  Stack,
+  Button,
+  Container,
+  VStack,
+  HStack,
+  Flex,
+  Avatar,
+  Spacer,
+  Divider,
+  IconButton
+} from "@chakra-ui/react";
+import { FiLogOut, FiEdit, FiSettings } from "react-icons/fi";
 
 const EmployeeDashboard = () => {
   const { projectId: paramProjectId } = useParams();
@@ -11,21 +28,21 @@ const EmployeeDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [pauseReasons, setPauseReasons] = useState({});
   const [project, setProject] = useState(null);
-  const [user, setUser] = useState(null);
-  const [showMenu, setShowMenu] = useState(false);
-
+  const location = useLocation();
+  const { name, email, status } = location.state || {};
   const navigate = useNavigate();
+
+  console.log(`${name}, ${email}, ${status}`)
+
   const effectiveProjectId = paramProjectId || localStorage.getItem("projectId");
 
   const fetchDashboardData = async () => {
     try {
-      const [tasksRes, employeesRes, projectRes] = await Promise.all([
-        axios.get(`/api/task/project/${effectiveProjectId}`, { withCredentials: true }),
-        axios.get(`/api/task/employee/${effectiveProjectId}`, { withCredentials: true }),
-        axios.get(`/api/project/${effectiveProjectId}`, { withCredentials: true })
-      ]);
-      console.log(employeesRes.data)
-      console.log(tasksRes.data.data)
+    const [tasksRes, employeesRes, projectRes] = await Promise.all([
+    axios.get(`/api/task/project/${effectiveProjectId}`, { withCredentials: true }),
+    axios.get(`/api/task/employee/${effectiveProjectId}`, { withCredentials: true }),
+    axios.get(`/api/project/${effectiveProjectId}`, { withCredentials: true })
+    ]);
 
       setTasks(tasksRes.data.data || []);
       setEmployees(employeesRes.data.data || []);
@@ -35,7 +52,7 @@ const EmployeeDashboard = () => {
     } finally {
       setLoading(false);
     }
-  }; 
+  };
 
   const handleLogout = async () => {
     try {
@@ -47,52 +64,36 @@ const EmployeeDashboard = () => {
     }
   };
 
-  const handleUpdateAvatar = () => {
-    navigate("/update-avatar");
-  };
-
-  const handleUpdateDetails = () => {
-    navigate("/update-account");
-  };
-
-  const handleChangePassword = () => {
-    navigate("/change-password");
-  };
-
   const updateStatus = async (taskId, newStatus, pauseReason = "") => {
-  try {
-    const response = await fetch(`http://localhost:3000/api/task/status/${taskId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        // Add auth headers if needed
-      },
-      credentials: "include",
-      body: JSON.stringify({
-        status: newStatus,
-        ...(newStatus === "paused" && { pauseReason })
-      })
-    });
-
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.message);
-
-    if (newStatus !== "paused") {
-      setPauseReasons((prev) => {
-        const updated = { ...prev };
-        delete updated[taskId];
-        return updated;
+    try {
+      const response = await fetch(`http://localhost:3000/api/task/status/${taskId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          status: newStatus,
+          ...(newStatus === "paused" && { pauseReason })
+        })
       });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message);
+
+      if (newStatus !== "paused") {
+        setPauseReasons((prev) => {
+          const updated = { ...prev };
+          delete updated[taskId];
+          return updated;
+        });
+      }
+      fetchDashboardData();
+    } catch (error) {
+      console.error("Failed to update task status:", error);
     }
-    fetchDashboardData();
-    // Update task list or state here if needed
-  } catch (error) {
-    console.error("Failed to update task status:", error);
-  }
   };
 
-  useEffect(() => { 
-    console.log("Effective projectId:", effectiveProjectId);
+  useEffect(() => {
+    console.log(location)
     if (effectiveProjectId) {
       fetchDashboardData();
     } else {
@@ -100,140 +101,192 @@ const EmployeeDashboard = () => {
     }
   }, [effectiveProjectId]);
 
-  if (loading) return <p>Loading Dashboard...</p>;
+  if (loading) return <Text p={4}>Loading Dashboard...</Text>;
 
-  const getTasksForEmployee = (employeeId) => {
-    return tasks.filter(task => task.assignedTo?._id === employeeId);
-  };
-  
   return (
-    <div>
-      <h1>Employee Dashboard</h1>
-      <h2>Project: {project?.name || "Unnamed Project"}</h2>
+    <Flex direction="column" height="100vh">
+      {/* Top Navigation Bar */}
+      <Flex bg={"gray.800"} color={"white"} px={6} py={3} align="center" justify="space-between">
+        <HStack spacing={4}>
+          <Text fontSize="xl" fontWeight="bold">LOGO</Text>
+          <Divider orientation="vertical" height="30px" />
+          <Text fontSize="md">Project: {project?.name || "Unnamed Project"}</Text>
+        </HStack>
 
-      <section>
-        <h3>Employees in Project</h3>
-        {employees.length === 0 ? (
-          <p>No employees found.</p>
-        ) : (
-          <ul style={{ listStyle: "none", padding: 0 }}>
-            {employees.map(emp => (
-              <li key={emp._id} style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
-                <div style={{
-                  width: "35px",
-                  height: "35px",
-                  borderRadius: "50%",
-                  backgroundColor: "#007bff",
-                  color: "#fff",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  fontWeight: "bold",
-                  fontSize: "1rem"
-                }}>
-                  {emp.name?.charAt(0).toUpperCase() || emp.email?.charAt(0).toUpperCase()}
-                </div>
-                <span>{emp.name || emp.email}</span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+        <HStack spacing={4}>
+          <Avatar name="Member 1" />
+          <Box textAlign="right">
+            <Text fontWeight="bold">{name}</Text>
+            <Text fontSize="sm">{email}</Text>
+            <Text
+                fontSize="sm"
+                fontWeight="bold"
+                color={status === "busy" ? "red.500" : status === "free" ? "green.500" : "gray.500"}
+              >
+              Status: {status}
+            </Text>
+          </Box>
+          <IconButton icon={<FiEdit />} onClick={() => navigate("/update-account")} aria-label="Edit" />
+          <IconButton icon={<FiSettings />} onClick={() => navigate("/change-password")} aria-label="Settings" />
+          <IconButton icon={<FiLogOut />} onClick={handleLogout} aria-label="Logout" />
+        </HStack>
+      </Flex>
 
-      <section>
-        <h3>Task Board</h3>
-        {tasks.length === 0 ? (
-          <p>No tasks found.</p>
-        ) : (
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead>
-              <tr>
-                <th style={{ border: "1px solid #ddd", padding: "8px" }}>Task</th>
-                <th style={{ border: "1px solid #ddd", padding: "8px" }}>Status</th>
-                <th style={{ border: "1px solid #ddd", padding: "8px" }}>Priority</th>
-                <th style={{ border: "1px solid #ddd", padding: "8px" }}>Deadline</th>
-                <th style={{ border: "1px solid #ddd", padding: "8px" }}>Time Left</th>
-                <th style={{ border: "1px solid #ddd", padding: "8px" }}>Time Spent</th>
-                <th style={{ border: "1px solid #ddd", padding: "8px" }}>Pause Reason</th>
-                <th style={{ border: "1px solid #ddd", padding: "8px" }}>Assigned By</th>
-              </tr>
-            </thead>
-            <tbody>
-              {tasks.map((task) => {
-                const deadline = new Date(task.deadline);
-                const now = new Date();
-                const timeLeft = deadline > now ? Math.ceil((deadline - now) / (1000 * 60 * 60)) + "h" : "Overdue";
-                const timeSpent = (task.totalTimeSpent / 3600).toFixed(1) + "h";
+      {/* Main Layout */}
+      <Flex flex="1" overflow="hidden" bg={"gray.700"}>
+        {/* Left Sidebar - Employees */}
+        <Box w="250px" p={4} bg="gray.600" overflowY="auto" margin={2} borderRadius={"md"}>
+          <Heading size="sm" mb={4}>Project Members</Heading>
+          <VStack align="start" spacing={4}>
+{employees.map(emp => {
+  console.log(employees); // Debug output
+  return (
+    <HStack key={emp._id}>
+      <Avatar size="sm" name={emp.name || emp.email} />
+      <Box>
+        <Text
+          fontWeight="bold"
+          color={
+            emp.status === "busy"
+              ? "red.500"
+              : emp.status === "free"
+              ? "green.500"
+              : "gray.500"
+          }
+        >
+          {emp.name || emp.email}
+        </Text>
+      </Box>
+    </HStack>
+  );
+})}
+          </VStack>
+        </Box>
 
-                return (
-                  <tr key={task._id}>
-                    <td style={{ border: "1px solid #ddd", padding: "8px" }}>{task.title}</td>
-                    <td style={{ border: "1px solid #ddd", padding: "8px" }}>
-                      <select
-                        value={task.status}
-                        onChange={(e) => {
-                          const selectedStatus = e.target.value;
+        {/* Task Board */}
+            <Box flex="1" p={4} overflowY="auto" bg="gray.700">
+  <Heading size="md" mb={3}>Task Board</Heading>
+  {tasks.length === 0 ? (
+    <Text>No tasks found.</Text>
+  ) : (
+    <SimpleGrid columns={[1, 2, 3]} spacing={4}>
+      {tasks.map((task) => {
+        const deadline = new Date(task.deadline);
+        const now = new Date();
+        const timeLeft =
+          deadline > now
+            ? Math.ceil((deadline - now) / (1000 * 60 * 60)) + "h"
+            : "Overdue";
+        const timeSpent = (task.totalTimeSpent / 3600).toFixed(1) + "h";
 
-                          if (selectedStatus === "paused") {
-                            setPauseReasons((prev) => ({ ...prev, [task._id]: "" }));
-                          } else {
-                            updateStatus(task._id, selectedStatus);
-                          }
-                        }}
-                        disabled={task.status === "completed"}
-                      >
-                        {["todo", "in-progress", "paused", "resume", "ready-for-review", "completed"].map((statusOption) => (
-                          <option key={statusOption} value={statusOption}>
-                            {statusOption}
-                          </option>
-                        ))}
-                      </select>
-                    </td>
+        return (
+          <Box
+            key={task._id}
+            borderWidth="1px"
+            borderRadius="md"
+            p={3}
+            shadow="sm"
+            bg="gray.600"
+          >
+            <Heading size="sm" mb={1}>{task.title}</Heading>
+            <Stack spacing={1.5} fontSize="sm">
+              <Box>
+                <Text fontWeight="semibold">Status:</Text>
+                <Select
+                  size="sm"
+                  value={task.status}
+                  onChange={(e) => {
+                    const selectedStatus = e.target.value;
+                    if (selectedStatus === "paused") {
+                      setPauseReasons((prev) => ({
+                        ...prev,
+                        [task._id]: "",
+                      }));
+                    } else {
+                      updateStatus(task._id, selectedStatus);
+                    }
+                  }}
+                  isDisabled={task.status === "completed"}
+                >
+                  {["todo", "in-progress", "paused", "resume", "ready-for-review", "completed"].map((s) => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </Select>
+              </Box>
+              <Divider/>
+              <Text fontWeight={"bold"}>Description:</Text>
+              <Text>{task.description}</Text>
 
-                    <td style={{ border: "1px solid #ddd", padding: "8px" }}>{task.priority}</td>
-                    <td style={{ border: "1px solid #ddd", padding: "8px" }}>{deadline.toLocaleDateString()}</td>
-                    <td style={{ border: "1px solid #ddd", padding: "8px" }}>{timeLeft}</td>
-                    <td style={{ border: "1px solid #ddd", padding: "8px" }}>{timeSpent}</td>
 
-                    <td style={{ border: "1px solid #ddd", padding: "8px" }}>
-                      {pauseReasons.hasOwnProperty(task._id) ? (
-                        <select
-                          value={pauseReasons[task._id]}
-                          onChange={(e) => {
-                            const reason = e.target.value;
-                            setPauseReasons((prev) => ({ ...prev, [task._id]: reason }));
+              <Divider/>
+              <HStack alignItems={"center"} justifyContent={"space-between"} marginTop={2} marginBottom={2}>
 
-                            if (reason !== "") {
-                              updateStatus(task._id, "paused", reason);
-                            }
-                          }}
-                        >
-                          <option value="">Select reason</option>
-                          {["system error", "break", "shift ended", "meeting"].map((reason) => (
-                            <option key={reason} value={reason}>
-                              {reason}
-                            </option>
-                          ))}
-                        </select>
-                      ) : task.status === "paused" ? (
-                        <button onClick={() => updateStatus(task._id, "resume")} disabled={task.status !== "paused"}>
-                          Resume
-                        </button>
-                      ) : (
-                        task.pauseReason || "—"
-                      )}
-                    </td>
+                  
+              <Box>
+                <Text fontWeight="semibold">Priority:</Text>
+                <Badge fontSize="0.75em" colorScheme={
+                  task.priority === "high" ? "red" :
+                  task.priority === "medium" ? "orange" : "green"
+                }>
+                  {task.priority}
+                </Badge>
+              </Box>
 
-                    <td style={{ border: "1px solid #ddd", padding: "8px" }}>{task.assignedBy?.name || "Admin"}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        )}
-      </section>
-    </div>
+              <Box><Text fontWeight="semibold">Deadline:</Text><Text>{deadline.toLocaleDateString()}</Text></Box>
+              <Box><Text fontWeight="semibold">Time Left:</Text><Text>{timeLeft}</Text></Box>
+               </HStack>
+              <Divider />
+
+               <HStack alignItems={"center"} justifyContent={"space-between"} marginTop={2} marginBottom={2}>
+              <Box><Text fontWeight="semibold">Time Spent:</Text><Text>{timeSpent}</Text></Box>
+
+              <Box>
+                <Text fontWeight="semibold">Pause Reason:</Text>
+                {pauseReasons.hasOwnProperty(task._id) ? (
+                  <Select
+                    size="sm"
+                    value={pauseReasons[task._id]}
+                    onChange={(e) => {
+                      const reason = e.target.value;
+                      setPauseReasons((prev) => ({
+                        ...prev,
+                        [task._id]: reason,
+                      }));
+                      if (reason !== "") {
+                        updateStatus(task._id, "paused", reason);
+                      }
+                    }}
+                  >
+                    <option value="">Select reason</option>
+                    {["system error", "break", "shift ended", "meeting"].map(reason => (
+                      <option key={reason} value={reason}>{reason}</option>
+                    ))}
+                  </Select>
+                ) : task.status === "paused" ? (
+                  <Button size="xs" onClick={() => updateStatus(task._id, "resume")}>
+                    Resume
+                  </Button>
+                ) : (
+                  <Text>{task.pauseReason || "—"}</Text>
+                )}
+              </Box>
+
+              <Box>
+                <Text fontWeight="semibold">Assigned By:</Text>
+                <Text>{task.assignedBy?.name || "Admin"}</Text>
+              </Box>
+              </HStack>
+            </Stack>
+          </Box>
+        );
+      })}
+    </SimpleGrid>
+  )}
+</Box>
+      </Flex>
+    </Flex>
   );
 };
+
 
 export default EmployeeDashboard;

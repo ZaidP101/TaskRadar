@@ -128,9 +128,11 @@ const loginUser = asyncHandler(async(req, res)=>{
       {
         user: {
           _id: loggedinUser._id,
+          name: loggedinUser.name,
           email: loggedinUser.email,
           isAdmin: loggedinUser.isAdmin,
-           project: loggedinUser.assignProjects?._id || null,
+          project: loggedinUser.assignProjects?._id || null,
+          status: loggedinUser.status || 'free', // default fallback
         },
         accessToken,
         refreshToken,

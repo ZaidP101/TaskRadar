@@ -10,66 +10,57 @@ function Home() {
       <div className="absolute top-5 left-6 text-xl font-bold">TaskRadar</div>
       <div className="absolute top-5 right-6 space-x-4">
         <Link to="/">
-            <Button variant="ghost" size="sm" className="">
-                Home
-            </Button>
+          <Button className="" variant="ghost" size="sm">Home</Button>
         </Link>
         <Link to="/About">
-            <Button variant="ghost" size="sm" className="">
-                About
-            </Button>
+          <Button className="" variant="ghost" size="sm">About</Button>
         </Link>
         <Link to="/Blog">
-          <Button variant="ghost" size="sm" className="">
-            Blog
-          </Button>
+          <Button className="" variant="ghost" size="sm">Blog</Button>
         </Link>
         <Link to="/FAQ">
-          <Button variant="ghost" size="sm" className="">
-            FAQ
-          </Button>
+          <Button className="" variant="ghost" size="sm">FAQ</Button>
         </Link>
         <Link to="/login">
-            <Button variant="ghost" size="sm" className="">
-                Log in
-            </Button>
+          <Button className="" variant="ghost" size="sm">Log in</Button>
         </Link>
       </div>
 
-      
-      <div className="text-center max-w-3xl mt-10">
-        <h1 className="text-4xl sm:text-5xl font-bold leading-tight mb-4">
-          From Workforce to Worthforce  <span className="italic text-purple-400">with TaskRadar.</span>
+      <div className="text-center max-w-4xl mt-16">
+        <h1 className="text-8xl sm:text-9xl font-extrabold leading-tight mb-10 font-serif">
+          From Workforce to Worthforce <span className="italic text-purple-500 font-serif">with TaskRadar.</span>
         </h1>
-        <p className="text-gray-400 mb-8 text-lg">
-          TaskRadar is more than a project dashboard — it's your intelligent work engine.
-            Designed for single-lead teams, it not only helps you assign tasks and manage projects, but also brings real-time visibility into work patterns, focus time, and productivity.
 
+        <p className="text-gray-400 mb-10 text-lg">
+          TaskRadar is more than a project dashboard — it's your intelligent work engine.
+          Designed for single-lead teams, it not only helps you assign tasks and manage projects,
+          but also brings real-time visibility into work patterns, focus time, and productivity.
         </p>
 
-        <div className="flex justify-center mb-4">
-          <Button variant="default" size="lg" className="px-6 py-3 text-md">
+        {/* Non-clickable Get Started Button */}
+        <div className="flex justify-center mb-10">
+          <div className="bg-purple-600 text-white px-6 py-3 text-lg font-medium rounded flex items-center">
             Get Started <FaArrowRight className="ml-2" />
-          </Button>
+          </div>
         </div>
 
         <div className="space-x-4">
           <Link to="/login">
-            <Button variant="secondary" size="lg" className="">
-                Login
+            <Button className="bg-purple-700 text-black hover:bg-purple-500" variant="default" size="lg">
+              Login
             </Button>
           </Link>
           <Link to="/signup">
-            <Button variant="secondary" size="lg" className="">
-                Sign Up
+            <Button className="bg-purple-700 text-black hover:bg-purple-500" variant="purple" size="lg">
+              Sign Up
             </Button>
           </Link>
         </div>
       </div>
 
-     {/*footer*/}
+      {/* Footer */}
       <div className="absolute bottom-5 text-sm text-gray-400 opacity-70">
-        Built with MERN • Analytics Ready • Built for Builders Powered by Productivity 
+        Built with MERN • Analytics Ready • Built for Builders Powered by Productivity
       </div>
     </div>
   );
