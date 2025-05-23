@@ -4,7 +4,9 @@ import {
     createProject, 
     projectCompleted,
     rmEmpFromColpltedProj,
-    getProjectById 
+    getProjectById,
+    getAllEmployees,
+    getAllProjects 
 } from "../controllers/projectCont.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 
@@ -21,6 +23,12 @@ router.route("/remove-employees")
 
 router.route("/add-employees")
 .post(verifyJWT, addEmployeesToProject)
+
+router.route("/all-projects")
+.get(verifyJWT, getAllProjects)
+
+router.route("/employees")
+.get(verifyJWT, getAllEmployees)
 
 router.route("/:id").get(verifyJWT, getProjectById);
 export default router

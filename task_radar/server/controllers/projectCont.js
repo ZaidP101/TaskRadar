@@ -3,6 +3,7 @@ import { ApiError } from "../utils/ApiErrors.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { User } from "../models/userMod.js"
 import { ApiResponse } from "../utils/ApiResponse.js";
+import { Task } from "../models/taskMod.js";
 
 
 const createProject = asyncHandler(async (req, res) => {
@@ -37,7 +38,7 @@ const createProject = asyncHandler(async (req, res) => {
 
         // Assign project to employee
         employee.assignProjects = project._id;
-        employee.status = "busy";
+        // employee.status = "busy";
         await employee.save();
     }
 
@@ -101,19 +102,27 @@ const addEmployeesToProject = asyncHandler(async (req, res) => {
             throw new ApiError(404, `Employee with ID ${empId} not found.`);
         }
 
-        if (employee.assignProjects.includes(project._id)) {
-            throw new ApiError(400, `Employee ${employee.name} is already assigned to this project.`);
+         if (employee.assignProjects !== null) {
+            throw new ApiError(400, `Employee ${employee.name} is already assigned to a project.`);
         }
         
 
         employee.assignProjects.push(project._id);
-        employee.status = "busy";
+        // employee.status = "busy";
         await employee.save();
 
         // Add to project only if not already included
-        if (!project.employees.includes(empId)) {
-            project.employees.push(empId);
+       if (project.employees === null) {
+            project.employees = [empId]; // Initialize with empId if null
+        }else {
+            for (let assigned of project.employees) {
+                if (assigned.toString() === empId.toString()) {
+                    throw new ApiError(400, `Employee is already added to this project.`);
+                }
+            }
+            project.employees.push(empId); // Add only if not found
         }
+
     }
 
     await project.save();
@@ -162,10 +171,41 @@ const getProjectById = async (req, res) => {
   }
 };
 
+
+const getAllEmployees = asyncHandler(async (req, res) => {
+    if (!req.user.isAdmin) {
+        throw new ApiError(403, "Only Admins can view all employees.");
+    }
+
+    const employees = await User.find({isAdmin:false}, "-password"); // exclude sensitive data
+    res.status(200).json(new ApiResponse(200, employees, "All employees fetched successfully."));
+});
+
+const getAllProjects = asyncHandler(async (req, res) => {
+    if (!req.user.isAdmin) {
+        throw new ApiError(403, "Only Admins can view all projects.");
+    }
+
+    const projects = await Project.find()
+    .populate("createdBy", "name email")
+    .populate("employees", "name email status")
+    .populate("tasks");
+
+    const formattedProjects = projects.map((project) => ({
+      ...project.toObject(),
+      totalEmployees: project.employees?.length || 0,
+      totalTasks: project.tasks?.length || 0,
+    }));
+    res.status(200).json(new ApiResponse(200, formattedProjects, "All projects fetched successfully."));
+});
+
+
 export {
     createProject,
     projectCompleted,
     rmEmpFromColpltedProj,
     addEmployeesToProject,
-    getProjectById
+    getProjectById,
+    getAllEmployees,
+    getAllProjects
 }

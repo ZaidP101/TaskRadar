@@ -4,65 +4,74 @@ import Footer from '../components/Footer';
 
 const AboutPage = () => {
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8">
+    <div className="bg-black min-h-screen text-white">
       <Header />
-      <h1 className="text-4xl font-bold mb-6 text-purple-400 text-center">About Task Radar</h1>
+      <div className="max-w-5xl mx-auto px-4 py-8 space-y-12">
+        <h1 className="text-4xl font-bold text-purple-400 text-center drop-shadow-lg">About Task Radar</h1>
 
-      <section className="mb-8">
-        <h2 className="text-2xl text-purple-800 font-semibold mb-2">Project Overview</h2>
-        <p className="text-gray-100">
-          <strong>Task Radar</strong> is a MERN stack-based task management platform designed for project-centric organizations. Inspired by Jira, it provides a granular, analytics-driven experience for team collaboration, task tracking, and time-based performance monitoring. Multiple team leads can manage different teams based on employee availability and project demands.
-        </p>
-      </section>
+        {/* Project Overview */}
+        <div className="bg-gray-900 p-6 rounded-2xl shadow-[0_4px_20px_rgba(128,90,213,0.3)] border border-purple-800 transform hover:scale-[1.01] transition duration-300">
+          <h2 className="text-2xl text-purple-400 font-semibold mb-3">Project Overview</h2>
+          <p className="text-gray-200">
+            <strong>Task Radar</strong> is a MERN stack-based task management platform designed for project-centric organizations...
+          </p>
+        </div>
 
-      <section className="mb-8">
-        <h2 className="text-2xl text-purple-800 font-semibold mb-2">Key Features</h2>
-        <ul className="list-disc list-inside text-gray-100 space-y-1">
-          <li>Multiple team leads can manage individual teams independently.</li>
-          <li>Each team lead can create teams, assign employees, and manage multiple projects.</li>
-          <li>Granular task assignment per employee, with deadlines and priorities.</li>
-          <li>Real-time task tracking with lifecycle states: <code>todo</code>, <code>in-progress</code>, <code>paused</code> (with reason), <code>ready-for-review</code>, and <code>completed</code>.</li>
-          <li>Automatic time logging and detailed activity tracking.</li>
-          <li>Email-based invitation system for new employees.</li>
-          <li>Role-based dashboards: Employees view personal progress, while team leads see team-wide analytics.</li>
-        </ul>
-      </section>
+        {/* Key Features */}
+        <div className="bg-gray-900 p-6 rounded-2xl shadow-[0_4px_20px_rgba(128,90,213,0.3)] border border-purple-800 transform hover:scale-[1.01] transition duration-300">
+          <h2 className="text-2xl text-purple-400 font-semibold mb-3">Key Features</h2>
+          <ul className="list-disc list-inside text-gray-200 space-y-2 pl-4">
+            <li>Multiple team leads can manage individual teams independently.</li>
+            <li>Team leads create teams, assign employees, and manage projects.</li>
+            <li>Granular task assignment with deadlines and priorities.</li>
+            <li>Task lifecycle states: <code>todo</code>, <code>in-progress</code>, <code>paused</code>, <code>ready-for-review</code>, <code>completed</code>.</li>
+            <li>Automatic time logging and activity tracking.</li>
+            <li>Email-based employee invitations.</li>
+            <li>Role-based dashboards for personal and team analytics.</li>
+          </ul>
+        </div>
 
-      <section className="mb-8">
-        <h2 className="text-2xl text-purple-800 font-semibold mb-2">System Architecture</h2>
-        <p className="text-gray-100 mb-4">
-          The system follows a layered and modular architecture using the MERN stack:
-        </p>
-        <ul className="list-disc list-inside text-gray-100 space-y-1">
-          <li><strong>Presentation Layer:</strong> React.js frontend for user interfaces.</li>
-          <li><strong>Business Logic Layer:</strong> Express.js API handling core logic, authentication, and analytics.</li>
-          <li><strong>Data Layer:</strong> MongoDB with Mongoose schemas for data persistence.</li>
-          <li><strong>External Service:</strong> Nodemailer for secure email-based invitations.</li>
-        </ul>
-      </section>
-      <section className="mb-8">
-        <h2 className="text-2xl text-purple-800 font-semibold mb-2">Analytics & Reporting</h2>
-        <ul className="list-disc list-inside text-gray-100 space-y-1">
-          <li><strong>Employee Dashboard:</strong> Shows task status, time spent, pause reasons, and personal trends.</li>
-          <li><strong>Team Lead Dashboard:</strong> Displays team-wide analytics including task distribution, performance metrics, and project status.</li>
-        </ul>
-      </section>
+        {/* System Architecture */}
+        <div className="bg-gray-900 p-6 rounded-2xl shadow-[0_4px_20px_rgba(128,90,213,0.3)] border border-purple-800 transform hover:scale-[1.01] transition duration-300">
+          <h2 className="text-2xl text-purple-400 font-semibold mb-3">System Architecture</h2>
+          <p className="text-gray-200 mb-4">
+            The system uses a modular MERN stack:
+          </p>
+          <ul className="list-disc list-inside text-gray-200 space-y-2 pl-4">
+            <li><strong>Frontend:</strong> React.js</li>
+            <li><strong>Backend:</strong> Express.js</li>
+            <li><strong>Database:</strong> MongoDB with Mongoose</li>
+            <li><strong>Service:</strong> Nodemailer for invitations</li>
+          </ul>
+        </div>
 
-      <section className="mb-8">
-        <h2 className="text-2xl text-purple-800 font-semibold mb-2">Security & Best Practices</h2>
-        <ul className="list-disc list-inside text-gray-100 space-y-1">
-          <li>JWT-based authentication with role-based access (team lead vs. employee).</li>
-          <li>Secure password hashing using bcrypt.</li>
-          <li>Input validation and strict data authorization at every endpoint.</li>
-        </ul>
-      </section>
+        {/* Analytics & Reporting */}
+        <div className="bg-gray-900 p-6 rounded-2xl shadow-[0_4px_20px_rgba(128,90,213,0.3)] border border-purple-800 transform hover:scale-[1.01] transition duration-300">
+          <h2 className="text-2xl text-purple-400 font-semibold mb-3">Analytics & Reporting</h2>
+          <ul className="list-disc list-inside text-gray-200 space-y-2 pl-4">
+            <li><strong>Employee Dashboard:</strong> Task status, time, trends</li>
+            <li><strong>Team Lead Dashboard:</strong> Analytics on tasks, performance</li>
+          </ul>
+        </div>
 
-      <section>
-        <h2 className="text-2xl text-purple-800 font-semibold mb-2">Conclusion</h2>
-        <p className="text-gray-100">
-          Task Radar offers a scalable, secure, and insightful task management solution tailored for collaborative teams and results-driven environments. Its modular design, robust data tracking, and real-time insights empower teams to deliver work efficiently while staying accountable.
-        </p>
-      </section>
+        {/* Security */}
+        <div className="bg-gray-900 p-6 rounded-2xl shadow-[0_4px_20px_rgba(128,90,213,0.3)] border border-purple-800 transform hover:scale-[1.01] transition duration-300">
+          <h2 className="text-2xl text-purple-400 font-semibold mb-3">Security & Best Practices</h2>
+          <ul className="list-disc list-inside text-gray-200 space-y-2 pl-4">
+            <li>JWT-based role authentication</li>
+            <li>Password hashing with bcrypt</li>
+            <li>Strict validation and authorization</li>
+          </ul>
+        </div>
+
+        {/* Conclusion */}
+        <div className="bg-gray-900 p-6 rounded-2xl shadow-[0_4px_20px_rgba(128,90,213,0.3)] border border-purple-800 transform hover:scale-[1.01] transition duration-300">
+          <h2 className="text-2xl text-purple-400 font-semibold mb-3">Conclusion</h2>
+          <p className="text-gray-200">
+            Task Radar is a secure, scalable, and analytics-rich platform built for collaborative and result-driven teams.
+          </p>
+        </div>
+      </div>
       <Footer />
     </div>
   );

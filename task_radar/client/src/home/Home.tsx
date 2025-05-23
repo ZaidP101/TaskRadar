@@ -3,6 +3,8 @@ import { Button } from "../components/ui/button";
 import { FaArrowRight } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
+
+
 function Home() {
   return (
     <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center px-4 py-10">
@@ -26,8 +28,8 @@ function Home() {
         </Link>
       </div>
 
-      <div className="text-center max-w-4xl mt-16">
-        <h1 className="text-8xl sm:text-9xl font-extrabold leading-tight mb-10 font-serif">
+     <div className="text-center max-w-4xl mt-16">
+        <h1 className="text-9xl font-extrabold leading-tight mb-10 font-serif">
           From Workforce to Worthforce <span className="italic text-purple-500 font-serif">with TaskRadar.</span>
         </h1>
 
@@ -38,15 +40,15 @@ function Home() {
         </p>
 
         {/* Non-clickable Get Started Button */}
-        <div className="flex justify-center mb-10">
-          <div className="bg-purple-600 text-white px-6 py-3 text-lg font-medium rounded flex items-center">
+         <div className="flex justify-center mb-4 border border-purple-600 mt-10 p-4 rounded-lg">
+          <Button variant="default" size="lg" className="px-6 py-3 text-md">
             Get Started <FaArrowRight className="ml-2" />
-          </div>
+          </Button>
         </div>
 
         <div className="space-x-4">
           <Link to="/login">
-            <Button className="bg-purple-700 text-black hover:bg-purple-500" variant="default" size="lg">
+            <Button className="bg-purple-700 text-black hover:bg-purple-500" variant="secondary" size="lg">
               Login
             </Button>
           </Link>

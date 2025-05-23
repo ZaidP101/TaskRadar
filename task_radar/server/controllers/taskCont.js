@@ -35,6 +35,10 @@ const createTask = asyncHandler(async (req, res) => {
   await Project.findByIdAndUpdate(project, {
     $push: { tasks: task._id },
   });
+  if (employee.status !== "busy") {
+    employee.status = "busy";
+    await employee.save();
+  }
   res.status(201).json(new ApiResponse(201, task, "Task created successfully."));
 });
 
