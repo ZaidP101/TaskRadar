@@ -22,19 +22,20 @@ import {
 import { FiLogOut, FiEdit, FiSettings } from "react-icons/fi";
 
 const EmployeeDashboard = () => {
-  const { projectId: paramProjectId } = useParams();
+  const { projectId: paramProjectId, employeeId } = useParams();
   const [tasks, setTasks] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pauseReasons, setPauseReasons] = useState({});
   const [project, setProject] = useState(null);
+   const [empInfo, setEmpInfo] = useState(null); //added
   const location = useLocation();
-  const { name, email, status } = location.state || {};
+  const { name, email, status, projectId: stateProjectId } = location.state || {};
   const navigate = useNavigate();
 
   console.log(`${name}, ${email}, ${status}`)
 
-  const effectiveProjectId = paramProjectId || localStorage.getItem("projectId");
+  const effectiveProjectId = paramProjectId || stateProjectId || localStorage.getItem("projectId");
 
   const fetchDashboardData = async () => {
     try {
@@ -93,18 +94,18 @@ const EmployeeDashboard = () => {
   };
 
   useEffect(() => {
-    console.log(location)
-    if (effectiveProjectId) {
-      fetchDashboardData();
-    } else {
+    if (!effectiveProjectId) {
       console.warn("No projectId available for EmployeeDashboard.");
+      // Optionally redirect or show a message
+    } else {
+      fetchDashboardData();
     }
   }, [effectiveProjectId]);
 
   if (loading) return <Text p={4}>Loading Dashboard...</Text>;
 
   return (
-    <Flex direction="column" height="100vh">
+    <Flex direction="column" height="100vh" >
       {/* Top Navigation Bar */}
       <Flex bg={"gray.800"} color={"white"} px={6} py={3} align="center" justify="space-between">
         <HStack spacing={4}>
@@ -133,7 +134,7 @@ const EmployeeDashboard = () => {
       </Flex>
 
       {/* Main Layout */}
-      <Flex flex="1" overflow="hidden" bg={"gray.700"}>
+      <Flex flex="1" overflow="hidden" bg={"gray.700"} color={"white"}>
         {/* Left Sidebar - Employees */}
         <Box w="250px" p={4} bg="gray.600" overflowY="auto" margin={2} borderRadius={"md"}>
           <Heading size="sm" mb={4}>Project Members</Heading>
@@ -187,6 +188,8 @@ const EmployeeDashboard = () => {
             p={3}
             shadow="sm"
             bg="gray.600"
+            transition="transform 0.2s ease-in-out"
+             _hover={{ transform: "translateY(-5px)",boxShadow: "md",}}
           >
             <Heading size="sm" mb={1}>{task.title}</Heading>
             <Stack spacing={1.5} fontSize="sm">
@@ -207,6 +210,10 @@ const EmployeeDashboard = () => {
                     }
                   }}
                   isDisabled={task.status === "completed"}
+                  bg="gray.500" 
+                  color="black"
+                  variant={"filled"}
+                  fontWeight={"semibold"}
                 >
                   {["todo", "in-progress", "paused", "resume", "ready-for-review", "completed"].map((s) => (
                     <option key={s} value={s}>{s}</option>

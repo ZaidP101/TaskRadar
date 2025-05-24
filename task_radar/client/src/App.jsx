@@ -8,6 +8,7 @@ import Home from './home/Home.js';
 import AboutPage from './home/About.js';
 import FaqPage from './home/FAQ.js';
 import BlogPage from './home/Blog.js';
+import ProjectDashboard from './projectDash.jsx';
 
 
 function App() {
@@ -25,8 +26,8 @@ function App() {
         {/* <Route path="/update-avatar" element={<UpdateAvatar />} />
         <Route path="/update-account" element={<UpdateAccount />} />
         <Route path="/change-password" element={<ChangePassword />} /> */}
-
-        
+        <Route path="/employee-dashboard/:employeeId" element={<EmployeeDashboard />} />
+        <Route path="/project-dashboard/:projectId" element={<ProjectDashboard />} />
       </Routes>
     </Router>
   );

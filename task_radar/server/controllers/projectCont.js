@@ -102,25 +102,16 @@ const addEmployeesToProject = asyncHandler(async (req, res) => {
             throw new ApiError(404, `Employee with ID ${empId} not found.`);
         }
 
-         if (employee.assignProjects !== null) {
+        if (employee.assignProjects) {
             throw new ApiError(400, `Employee ${employee.name} is already assigned to a project.`);
         }
         
 
-        employee.assignProjects.push(project._id);
-        // employee.status = "busy";
+        employee.assignProjects = project._id;
         await employee.save();
 
-        // Add to project only if not already included
-       if (project.employees === null) {
-            project.employees = [empId]; // Initialize with empId if null
-        }else {
-            for (let assigned of project.employees) {
-                if (assigned.toString() === empId.toString()) {
-                    throw new ApiError(400, `Employee is already added to this project.`);
-                }
-            }
-            project.employees.push(empId); // Add only if not found
+        if (!project.employees.includes(empId)) {
+            project.employees.push(empId);
         }
 
     }
@@ -160,7 +151,8 @@ const rmEmpFromColpltedProj = asyncHandler(async(req, res)=>{
 
 const getProjectById = async (req, res) => {
   try {
-    const project = await Project.findById(req.params.id);
+    const project = await Project.findById(req.params.id)
+    .populate("employees", "name email status");
     if (!project) {
       return res.status(404).json({ message: "Project not found" });
     }

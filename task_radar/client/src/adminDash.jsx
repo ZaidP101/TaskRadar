@@ -13,6 +13,7 @@
     IconButton,
     SimpleGrid,
     Badge,
+    Button,
   } from "@chakra-ui/react";
   import { FiLogOut, FiEdit, FiSettings } from "react-icons/fi";
 
@@ -20,6 +21,7 @@
     const [employees, setEmployees] = useState([]);
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [selectedProject, setSelectedProject] = useState(null);
     const navigate = useNavigate();
     const location = useLocation();
     const { name, email } = location.state || {};
@@ -56,7 +58,7 @@
     if (loading) return <Text p={4}>Loading Admin Dashboard...</Text>;
 
     return (
-      <Flex direction="column" height="100vh">
+      <Flex direction="column" height="100vh" color={"white"}>
         {/* Top Navigation Bar */}
         <Flex bg={"gray.800"} color={"white"} px={6} py={3} align="center" justify="space-between">
           <HStack spacing={4}>
@@ -82,31 +84,75 @@
           {/* Left Sidebar - Employees */}
           <Box w="250px" p={4} bg="gray.600" overflowY="auto" margin={2} borderRadius={"md"}>
             <Heading size="sm" mb={4}>Employees</Heading>
+            <Divider marginBottom={3}/>
             <VStack align="start" spacing={4}>
               {employees.map(emp => (
-                <HStack key={emp._id}>
-                  <Avatar size="sm" name={emp.name || emp.email} />
-                  <Box>
-                    <Text fontWeight="bold" color={
-                      emp.status === "busy" ? "red.500" :
-                      emp.status === "free" ? "green.500" :
-                      "gray.500"
-                    }>
-                      {emp.name || emp.email}
-                    </Text>
-                  </Box>
-                </HStack>
+              
+                <Box
+                  as="button"
+                  key={emp._id}
+                  width="100%"
+                  textAlign="left"
+
+                  onClick={() => {
+                    if (emp.assignProjects) {
+                      navigate(`/employee-dashboard/${emp._id}`, {
+                        state: {
+                          name: emp.name,
+                          email: emp.email,
+                          status: emp.status,
+                          projectId: emp.assignProjects,
+                        },
+                      });
+                      localStorage.setItem("projectId", emp.assignProjects);
+                    } else {
+                      alert("This employee is not assigned to any project.");
+                    }
+                  }}
+                >
+                  <HStack
+                    border="2px"
+                    width="100%"
+                    padding={3}
+                    borderColor="gray.700"
+                    borderRadius={6}
+                    bg="gray.700"
+                    transition="transform 0.2s ease-in-out"
+                    _hover={{
+                      transform: "translateX(-5px)",
+                      boxShadow: "md",
+                    }}
+                  >
+                    <Avatar size="sm" name={emp.name || emp.email} />
+                    <Box>
+                      <Text
+                        fontWeight="bold"
+                        color={
+                          emp.status === "busy"
+                            ? "red.500"
+                            : emp.status === "free"
+                            ? "green.500"
+                            : "gray.500"
+                        }
+                      >
+                        {emp.name || emp.email}
+                      </Text>
+                    </Box>
+                  </HStack>
+                </Box>
               ))}
+
             </VStack>
           </Box>
 
           {/* Right Side - Projects */}
           <Box flex="1" p={4} overflowY="auto" bg="gray.700">
-            <Heading size="md" mb={3}>Projects</Heading>
+            <Heading size="md" mb={3} marginBottom={4}>Projects</Heading>
+            <Divider marginBottom={5}/>
             {projects.length === 0 ? (
               <Text>No projects found.</Text>
             ) : (
-              <SimpleGrid columns={[1, 2, 3]} spacing={4}>
+              <SimpleGrid columns={[1, 2, 3]} spacing={6}>
                 {projects.map((project) => (
                   <Box
                     key={project._id}
@@ -115,21 +161,41 @@
                     p={3}
                     shadow="sm"
                     bg="gray.600"
+                    transition="transform 0.2s ease-in-out" 
+                    _hover={{ transform: "translateY(-5px)",boxShadow: "md",}}
                   >
-                    <Heading size="sm" mb={2}>{project.name}</Heading>
-                    <Text fontSize="sm" mb={1}><strong>Description:</strong> {project.description || "N/A"}</Text>
-                    <Text fontSize="sm" mb={1}><strong>Status:</strong> {project.status || "In Progress"}</Text>
-                    <Text fontSize="sm" mb={1}><strong>Total Emp:</strong> {project.totalEmployees}</Text>
-                    <Text fontSize="sm" mb={1}><strong>Total Task:</strong> {project.totalTasks}</Text>
-                    <Text fontSize="sm" mb={1}><strong>Task:</strong> {}</Text>
+                    <Heading size="sm" mb={2} marginBottom={3}>{project.name} </Heading>
+                    <Divider/>
+                    <Text fontSize="sm" mb={1}  marginBottom={3} marginTop={3} ><strong>Description:</strong> {project.description || "N/A"}</Text>
+                    <Divider marginBottom={3}/>
+                    <HStack spacing={2} alignItems={"center"} justifyContent={"space-between"} marginBottom={3}>
+                      <Text fontSize="sm" mb={1}><strong>Status:</strong> {project.status || "In Progress"}</Text>
+                      <Text fontSize="sm" mb={1}><strong>Total Emp:</strong> {project.totalEmployees}</Text>
+                      <Text fontSize="sm" mb={1}><strong>Total Task:</strong> {project.totalTasks}</Text>
+                    </HStack>
                     {project.createdBy && (
-                      <Text fontSize="sm" mb={1}><strong>Created By:</strong> {project.createdBy.name || project.createdBy.email}</Text>
+                      <Text fontSize="sm" mb={1} marginBottom={4}><strong>Created By:</strong> {project.createdBy.name || project.createdBy.email}</Text>
                     )}
+                    <Button
+                      marginBottom={2}
+                      bg={"gray.300"}
+                      w={"100%"}
+                      onClick={() => navigate(`/project-dashboard/${project._id}`, {
+                        state: {
+                          adminName: name,
+                          adminEmail: email,
+                        }
+                      })}
+                    >
+                      VIEW
+                    </Button>
+
                   </Box>
                 ))}
               </SimpleGrid>
             )}
           </Box>
+
         </Flex>
       </Flex>
     );
