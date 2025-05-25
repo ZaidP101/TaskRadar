@@ -121,6 +121,47 @@ const addEmployeesToProject = asyncHandler(async (req, res) => {
     res.status(200).json(new ApiResponse(200, project, "Employees added to project successfully."));
 });
 
+const removeEmployeesFromProject = asyncHandler(async (req, res) => {
+    const { projectId, employees } = req.body;
+
+    if (!projectId || !employees || employees.length === 0) {
+        throw new ApiError(400, "Project ID and at least one employee ID are required.");
+    }
+
+    if (!req.user.isAdmin) {
+        throw new ApiError(403, "Only Admins can remove employees from a project.");
+    }
+
+    const project = await Project.findById(projectId);
+    if (!project) {
+        throw new ApiError(404, "Project not found.");
+    }
+
+    for (let empId of employees) {
+        const employee = await User.findById(empId);
+
+        if (!employee) {
+            throw new ApiError(404, `Employee with ID ${empId} not found.`);
+        }
+
+        if (!employee.assignProjects || employee.assignProjects.toString() !== projectId) {
+            throw new ApiError(400, `Employee ${employee.name} is not assigned to this project.`);
+        }
+
+        // Remove employee from project
+        employee.assignProjects = null;
+        employee.status = "free";
+        await employee.save();
+
+        // Remove from project's employees array
+        project.employees = project.employees.filter(id => id.toString() !== empId);
+    }
+
+    await project.save();
+
+    res.status(200).json(new ApiResponse(200, project, "Employees removed from project successfully."));
+});
+
 
 const rmEmpFromColpltedProj = asyncHandler(async(req, res)=>{
     const {projectId} = req.body;
@@ -199,5 +240,6 @@ export {
     addEmployeesToProject,
     getProjectById,
     getAllEmployees,
-    getAllProjects
+    getAllProjects,
+    removeEmployeesFromProject
 }

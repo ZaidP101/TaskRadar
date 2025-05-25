@@ -16,6 +16,7 @@
     Button,
   } from "@chakra-ui/react";
   import { FiLogOut, FiEdit, FiSettings } from "react-icons/fi";
+  import { AddIcon } from '@chakra-ui/icons';
 
   const AdminDashboard = () => {
     const [employees, setEmployees] = useState([]);
@@ -24,8 +25,16 @@
     const [selectedProject, setSelectedProject] = useState(null);
     const navigate = useNavigate();
     const location = useLocation();
-    const { name, email } = location.state || {};
-
+    // Try to get from location.state first, then fallback to localStorage
+    let adminInfoFromStorage = {};
+    try {
+      adminInfoFromStorage = JSON.parse(localStorage.getItem("adminInfo")) || {};
+    } catch (e) {
+      adminInfoFromStorage = {};
+    }
+    const { name, email } = location.state || adminInfoFromStorage;
+    console.log(`name : ${name}, email ${email}`);
+    
     const fetchData = async () => {
       try {
         const [empRes, projRes] = await Promise.all([
@@ -194,6 +203,35 @@
                 ))}
               </SimpleGrid>
             )}
+          </Box>
+          <Box
+            position="fixed"
+            bottom="20px"
+            right="20px"
+            zIndex="tooltip"
+          >
+            <Button
+              colorScheme="blue"
+              borderRadius="full"
+              boxShadow="2xl"
+              w="60px"
+              h="60px"
+              onClick={() => navigate("/create-project")}
+              aria-label="Add Project"
+              sx={{
+                transform: "translateY(0)",
+                transition: "all 0.2s cubic-bezier(.08,.52,.52,1)",
+                _hover: {
+                  transform: "translateY(-3px)",
+                  boxShadow: "xl"
+                },
+                _active: {
+                  transform: "scale(0.95)"
+                }
+              }}
+            >
+              <AddIcon boxSize={6} />
+            </Button>
           </Box>
 
         </Flex>

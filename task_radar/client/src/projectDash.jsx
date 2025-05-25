@@ -2,9 +2,23 @@ import { useEffect, useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import axios from "./axios";
 import {
-  Box, Text, Heading, VStack, HStack, Flex, Avatar, Divider, IconButton, SimpleGrid, Badge, Button
+  Box,
+  Text,
+  Heading,
+  VStack,
+  HStack,
+  Flex,
+  Avatar,
+  Divider,
+  IconButton,
+  Tooltip,
+  SimpleGrid,
+  Badge,
+  Button
 } from "@chakra-ui/react";
-import { FiLogOut, FiEdit, FiSettings } from "react-icons/fi";
+import { FiLogOut, FiEdit, FiSettings, FiTrash2 } from "react-icons/fi";
+import { AddIcon } from "@chakra-ui/icons";
+
 
 const ProjectDashboard = () => {
   const { projectId } = useParams();
@@ -16,6 +30,7 @@ const ProjectDashboard = () => {
   const [employees, setEmployees] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [allEmployees, setAllEmployees] = useState([]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -37,9 +52,27 @@ const ProjectDashboard = () => {
   useEffect(() => {
     fetchData();
   }, [projectId]);
-    useEffect(() => {
-        console.log("Project employees:", employees);
-    }, [employees]);
+  
+  useEffect(() => {
+    console.log("Project employees:", employees);
+  }, [employees]);
+
+  useEffect(() => {
+    axios.get("/api/project/employees", { withCredentials: true })
+      .then(res => setAllEmployees(res.data.data || []))
+      .catch(() => setAllEmployees([]));
+  }, []);
+
+  const handleDeleteTask = async (taskId) => {
+    if (!window.confirm("Are you sure you want to delete this task?")) return;
+    try {
+      await axios.delete(`/api/task/${taskId}`, { withCredentials: true });
+      // Refresh the task list after deletion
+      fetchData();
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to delete task.");
+    }
+  };
 
 
   const handleLogout = async () => {
@@ -51,6 +84,31 @@ const ProjectDashboard = () => {
       console.error("Logout failed", err);
     }
   };
+
+  const handleAddEmployee = async (empId) => {
+  try {
+    await axios.post("/api/project/add-employees", {
+      projectId,
+      employees: [empId],
+    }, { withCredentials: true });
+    fetchData(); // Refresh project data
+  } catch (err) {
+    alert(err.response?.data?.message || "Failed to add employee");
+  }
+};
+
+const handleRemoveEmployee = async (empId) => {
+  try {
+    await axios.post("/api/project/remove-employees", {
+      projectId,
+      employees: [empId],
+    }, { withCredentials: true });
+    fetchData(); // Refresh project data
+  } catch (err) {
+    alert(err.response?.data?.message || "Failed to remove employee");
+  }
+};
+
 
   if (loading) return <Text p={4}>Loading Project Dashboard...</Text>;
 
@@ -82,26 +140,53 @@ const ProjectDashboard = () => {
           <Heading size="sm" mb={4}>Project Members</Heading>
           <Divider marginBottom={3}/>
           <VStack align="start" spacing={4}>
-                {employees.map(emp => (
-                    <HStack key={emp._id || emp.email || Math.random()}>
-                    <Avatar size="sm" name={emp.name || emp.email} />
-                    <Box>
-                        <Text
-                        fontWeight="bold"
-                        color={
-                            emp.status === "busy"
-                            ? "red.500"
-                            : emp.status === "free"
-                            ? "green.500"
-                            : "gray.500"
-                        }
-                        >
-                        {emp.name || emp.email}
-                        </Text>
-                    </Box>
-                    </HStack>
-                ))}
-            </VStack>
+            {/* Employees in project */}
+            {employees.map(emp => (
+              <HStack key={emp._id}>
+                <Avatar size="sm" name={emp.name || emp.email} />
+                <Box>
+                  <Text fontWeight="bold" color={
+                    emp.status === "busy"
+                      ? "red.500"
+                      : emp.status === "free"
+                      ? "green.500"
+                      : "gray.500"
+                  }>
+                    {emp.name || emp.email}
+                  </Text>
+                </Box>
+                <IconButton
+                  icon={<span>-</span>}
+                  size="xs"
+                  colorScheme="red"
+                  aria-label="Remove"
+                  onClick={() => handleRemoveEmployee(emp._id)}
+                  ml={2}
+                />
+              </HStack>
+            ))}
+            <Divider />
+            <Text fontWeight="bold" color="gray.300" fontSize="sm" mt={2}>Add to Project:</Text>
+            {/* Employees not in project */}
+            {allEmployees
+              .filter(emp => !employees.some(e => e._id === emp._id))
+              .map(emp => (
+                <HStack key={emp._id}>
+                  <Avatar size="sm" name={emp.name || emp.email} />
+                  <Box>
+                    <Text fontWeight="bold">{emp.name || emp.email}</Text>
+                  </Box>
+                  <IconButton
+                    icon={<span>+</span>}
+                    size="xs"
+                    colorScheme="green"
+                    aria-label="Add"
+                    onClick={() => handleAddEmployee(emp._id)}
+                    ml={2}
+                  />
+                </HStack>
+              ))}
+          </VStack>
 
         </Box>
 
@@ -129,9 +214,31 @@ const ProjectDashboard = () => {
                     p={3}
                     shadow="sm"
                     bg="gray.600"
+                    position="relative"
                     transition="transform 0.2s ease-in-out"
                     _hover={{ transform: "translateY(-5px)", boxShadow: "md" }}
                   >
+                    {/* Top-right icon buttons */}
+                    <HStack position="absolute" top={2} right={2} spacing={2}>
+                      <Tooltip label="Edit Task" hasArrow>
+                        <IconButton
+                          icon={<FiEdit />}
+                          size="sm"
+                          colorScheme="blue"
+                          aria-label="Edit Task"
+                          isDisabled // Remove this if you implement edit
+                        />
+                      </Tooltip>
+                      <Tooltip label="Delete Task" hasArrow>
+                        <IconButton
+                          icon={<FiTrash2 />}
+                          size="sm"
+                          colorScheme="red"
+                          aria-label="Delete Task"
+                          onClick={() => handleDeleteTask(task._id)}
+                        />
+                      </Tooltip>
+                    </HStack>
                     <Heading size="sm" mb={1}>{task.title}</Heading>
                     <Text fontWeight="bold">Status: {task.status}</Text>
                     <Divider />
@@ -164,6 +271,37 @@ const ProjectDashboard = () => {
               })}
             </SimpleGrid>
           )}
+        </Box>
+
+        
+        <Box
+          position="fixed"
+          bottom="90px"
+          right="20px"
+          zIndex="tooltip"
+        >
+          <Button
+            colorScheme="green"
+            borderRadius="full"
+            boxShadow="2xl"
+            w="60px"
+            h="60px"
+            onClick={() => navigate(`/project-dashboard/${projectId}/create-task`)}
+            aria-label="Add Task"
+            sx={{
+              transform: "translateY(0)",
+              transition: "all 0.2s cubic-bezier(.08,.52,.52,1)",
+              _hover: {
+                transform: "translateY(-3px)",
+                boxShadow: "xl"
+              },
+              _active: {
+                transform: "scale(0.95)"
+              }
+            }}
+          >
+            <AddIcon boxSize={6} />
+          </Button>
         </Box>
       </Flex>
     </Flex>

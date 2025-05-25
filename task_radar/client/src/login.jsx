@@ -27,6 +27,10 @@ function Login() {
       }
       alert(`Welcome, ${emailFromDB}!, Name: ${name}, Status: ${status}`);
       console.log()
+      localStorage.setItem(
+        "adminInfo",
+        JSON.stringify({ name, email: emailFromDB, status, isAdmin })
+      );
       // Route based on admin flag
       navigate(isAdmin ? '/adminDash' : `/empDash/${project}`, {
       state: {

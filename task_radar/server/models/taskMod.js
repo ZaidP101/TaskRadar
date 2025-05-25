@@ -40,7 +40,7 @@ const taskSchema = new mongoose.Schema({
     end: Date,
     pauseReason: {
       type: String,
-      enum: ['system error', 'break', 'shift ended', 'meeting', null], // null for active sessions
+      enum: ['system error', 'break', 'shift ended', 'meeting', null], 
       default: null
     }
   }],

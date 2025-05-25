@@ -128,13 +128,32 @@ const deleteTask = asyncHandler(async (req, res) => {
   if (!req.user.isAdmin) {
     throw new ApiError(403, "Only Admin can delete tasks.");
   }
+
   const { taskId } = req.params;
 
-  const task = await Task.findByIdAndDelete(taskId);
+  const task = await Task.findById(taskId);
   if (!task) throw new ApiError(404, "Task not found.");
 
-  res.status(200).json(new ApiResponse(200, {}, "Task deleted successfully."));
+  const employeeId = task.assignedTo;
+  const projectId = task.project;
+
+  await Task.findByIdAndDelete(taskId);
+  await Project.findByIdAndUpdate(projectId, {
+    $pull: { tasks: taskId }
+  });
+
+  const remainingTasks = await Task.find({ assignedTo: employeeId });
+  if (remainingTasks.length === 0) {
+    const employee = await User.findById(employeeId);
+    if (employee) {
+      employee.status = "free";
+      await employee.save();
+    }
+  }
+
+  res.status(200).json(new ApiResponse(200, {}, "Task deleted successfully and employee status updated if applicable."));
 });
+
 
 export {
   createTask,
