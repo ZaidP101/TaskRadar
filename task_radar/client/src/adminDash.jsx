@@ -15,7 +15,7 @@
     Badge,
     Button,
   } from "@chakra-ui/react";
-  import { FiLogOut, FiEdit, FiSettings } from "react-icons/fi";
+  import { FiLogOut, FiEdit, FiSettings, FiTrash2  } from "react-icons/fi";
   import { AddIcon } from '@chakra-ui/icons';
 
   const AdminDashboard = () => {
@@ -49,6 +49,17 @@
         setLoading(false);
       }
     };
+
+    const handleDeleteProject = async (projectId) => {
+      if (!window.confirm("Are you sure you want to delete this project?")) return;
+      try {
+        await axios.delete(`/api/project/${projectId}`, { withCredentials: true });
+        fetchData(); // Refresh the project list
+      } catch (err) {
+        alert(err.response?.data?.message || "Failed to delete project.");
+      }
+    };
+
 
     const handleLogout = async () => {
       try {
@@ -172,7 +183,18 @@
                     bg="gray.600"
                     transition="transform 0.2s ease-in-out" 
                     _hover={{ transform: "translateY(-5px)",boxShadow: "md",}}
+                    position="relative"
                   >
+                    <IconButton
+                      icon={<FiTrash2 />}
+                      size="sm"
+                      colorScheme="red"
+                      aria-label="Delete project"
+                      onClick={() => handleDeleteProject(project._id)}
+                      position="absolute"
+                      top={2}
+                      right={2}
+                    />
                     <Heading size="sm" mb={2} marginBottom={3}>{project.name} </Heading>
                     <Divider/>
                     <Text fontSize="sm" mb={1}  marginBottom={3} marginTop={3} ><strong>Description:</strong> {project.description || "N/A"}</Text>

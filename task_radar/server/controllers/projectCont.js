@@ -53,32 +53,51 @@ const createProject = asyncHandler(async (req, res) => {
 });
 
 
-const projectCompleted = asyncHandler(async(req, res)=>{
-    const { projectId } = req.body;
+const projectCompleted = asyncHandler(async (req, res) => {
+  const { projectId } = req.body;
 
-    if(!projectId){
-        throw new ApiError(400, "Project ID is required.");
-    }
+  if (!projectId) {
+    throw new ApiError(400, "Project ID is required.");
+  }
 
-    if(!req.user.isAdmin){
-        throw new ApiError(403, "Only Admin can Mark project as complted.");
-    }
+  if (!req.user.isAdmin) {
+    throw new ApiError(403, "Only Admin can mark project as completed.");
+  }
 
-    const project = await Project.findById(projectId)
-    if(!project){
-        throw new ApiError(404, "Project not found.");
-    }
+  const project = await Project.findById(projectId).populate("tasks");
+  if (!project) {
+    throw new ApiError(404, "Project not found.");
+  }
 
-    if(project.status === "completed"){
-        throw new ApiError(400, "Project is already completed.")
-    }
+  if (project.status === "completed") {
+    throw new ApiError(400, "Project is already completed.");
+  }
 
-    project.status = "completed";
-    await project.save();
+  // Check if all tasks are completed
+  const incompleteTasks = await Task.find({
+    project: projectId,
+    status: { $ne: "completed" }
+  });
 
-    res.status(200)
-    .json( new ApiResponse(200, {}, "Project marked as completed successfully"))
-})
+  if (incompleteTasks.length > 0) {
+    throw new ApiError(400, "All tasks must be completed before marking project as complete.");
+  }
+
+  project.status = "completed";
+  await project.save();
+
+  const employees = await User.find({ assignProjects: projectId });
+  for (const emp of employees) {
+    emp.assignProjects = null;
+    emp.status = "free";
+    await emp.save();
+  }
+
+  res.status(200).json(
+    new ApiResponse(200, {}, "Project marked as completed and employees released")
+  );
+});
+
 
 const addEmployeesToProject = asyncHandler(async (req, res) => {
     const { projectId, employees } = req.body;
@@ -232,6 +251,34 @@ const getAllProjects = asyncHandler(async (req, res) => {
     res.status(200).json(new ApiResponse(200, formattedProjects, "All projects fetched successfully."));
 });
 
+const deleteProject = asyncHandler(async (req, res) => {
+  const { id } = req.params; 
+  if (!req.user.isAdmin) {
+    throw new ApiError(403, "Only Admins can delete projects.");
+  }
+
+  const project = await Project.findById(id);
+  if (!project) {
+    throw new ApiError(404, "Project not found.");
+  }
+
+  await Task.deleteMany({ project: id });
+
+  const employees = await User.find({ assignProjects: id });
+  for (const emp of employees) {
+    emp.assignProjects = null;
+    emp.status = "free";
+    await emp.save();
+  }
+
+  await Project.findByIdAndDelete(id);
+
+  res.status(200).json(
+    new ApiResponse(200, {}, "Project and all associated tasks deleted successfully")
+  );
+});
+
+
 
 export {
     createProject,
@@ -241,5 +288,6 @@ export {
     getProjectById,
     getAllEmployees,
     getAllProjects,
-    removeEmployeesFromProject
+    removeEmployeesFromProject,
+    deleteProject
 }
