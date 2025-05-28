@@ -14,6 +14,7 @@
     SimpleGrid,
     Badge,
     Button,
+    Select,
   } from "@chakra-ui/react";
   import { FiLogOut, FiEdit, FiSettings, FiTrash2  } from "react-icons/fi";
   import { AddIcon } from '@chakra-ui/icons';
@@ -60,16 +61,44 @@
       }
     };
 
+    const handleUpdateStatus = async (projectId, newStatus) => {
+      try {
+        const response = await axios.post(
+          "/api/project/completed",
+          { projectId },
+          { withCredentials: true }
+        );
+        
+        if (response.data.success) {
+          // Update local state instead of refetching all data
+          setProjects(prev => prev.map(proj => 
+            proj._id === projectId ? {...proj, status: newStatus} : proj
+          ));
+        }
+      } catch (err) {
+        alert(err.response?.data?.message || "Failed to update status");
+        setProjects(prev => prev.map(proj => 
+          proj._id === projectId ? {...proj, status: "ongoing"} : proj
+        ));
+      }
+    };
 
     const handleLogout = async () => {
       try {
-        await axios.get("/api/users/logout", { withCredentials: true });
+        await axios.post("/api/auth/logout",{}, { withCredentials: true });
         localStorage.clear();
         navigate("/login");
       } catch (err) {
         console.error("Logout failed", err);
       }
     };
+
+    const handleAdminDashboardClick = () => {
+      navigate('/adminDash', { replace: true });
+      // If you want to force a full reload:
+      window.location.href = '/adminDash';
+    };
+
 
     useEffect(() => {
       fetchData();
@@ -84,7 +113,16 @@
           <HStack spacing={4}>
             <Text fontSize="xl" fontWeight="bold">LOGO</Text>
             <Divider orientation="vertical" height="30px" />
-            <Text fontSize="md">Admin Dashboard</Text>
+            <Text
+              fontSize="md"
+              fontWeight="bold"
+              color="teal.200"
+              cursor="pointer"
+              _hover={{ textDecoration: "underline", color: "teal.300" }}
+              onClick={() => navigate('/adminDash')}
+            >
+              Admin Dashboard
+            </Text>
           </HStack>
 
           <HStack spacing={4}>
@@ -200,10 +238,28 @@
                     <Text fontSize="sm" mb={1}  marginBottom={3} marginTop={3} ><strong>Description:</strong> {project.description || "N/A"}</Text>
                     <Divider marginBottom={3}/>
                     <HStack spacing={2} alignItems={"center"} justifyContent={"space-between"} marginBottom={3}>
-                      <Text fontSize="sm" mb={1}><strong>Status:</strong> {project.status || "In Progress"}</Text>
+                      <Box>
+                        <Text fontSize="sm" mb={1}><strong>Status:</strong></Text>
+                        <Select
+                          value={project.status}
+                          onChange={(e) => handleUpdateStatus(project._id, e.target.value)}
+                          size="sm"
+                          width="120px"
+                          isDisabled={project.status === "completed"}
+                          bg="gray.700"
+                          color="white"
+                          borderColor="gray.600"
+                          _focus={{ bg: "gray.700", color: "white" }}
+                          _hover={{ bg: "gray.700", color: "white" }}
+                        >
+                          <option style={{ background: "#2D3748", color: "white" }} value="ongoing">Ongoing</option>
+                          <option style={{ background: "#2D3748", color: "white" }} value="completed">Completed</option>
+                        </Select>
+                      </Box>
                       <Text fontSize="sm" mb={1}><strong>Total Emp:</strong> {project.totalEmployees}</Text>
                       <Text fontSize="sm" mb={1}><strong>Total Task:</strong> {project.totalTasks}</Text>
                     </HStack>
+
                     {project.createdBy && (
                       <Text fontSize="sm" mb={1} marginBottom={4}><strong>Created By:</strong> {project.createdBy.name || project.createdBy.email}</Text>
                     )}

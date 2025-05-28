@@ -11,6 +11,8 @@ import BlogPage from './home/Blog.js';
 import ProjectDashboard from './projectDash.jsx';
 import CreateProject from './createProject.jsx';
 import CreateTask from './createTask.jsx';
+import ChangePassword from './changePass.jsx';
+import UpdateAccount from './UpdateAccount.jsx';
 
 
 function App() {
@@ -25,13 +27,12 @@ function App() {
         <Route path="/About" element={<AboutPage />} />
         <Route path="/FAQ" element={<FaqPage />} />
         <Route path="/Blog" element={<BlogPage />} />
-        {/* <Route path="/update-avatar" element={<UpdateAvatar />} />
-        <Route path="/update-account" element={<UpdateAccount />} />
-        <Route path="/change-password" element={<ChangePassword />} /> */}
         <Route path="/employee-dashboard/:employeeId" element={<EmployeeDashboard />} />
         <Route path="/project-dashboard/:projectId" element={<ProjectDashboard />} />
         <Route path="/create-project" element={<CreateProject />} />
         <Route path="/project-dashboard/:projectId/create-task" element={<CreateTask />} />
+        <Route path="/update-account" element={<UpdateAccount />} />
+        <Route path="/change-password" element={<ChangePassword />} />
       </Routes>
     </Router>
   );

@@ -57,7 +57,7 @@ const EmployeeDashboard = () => {
 
   const handleLogout = async () => {
     try {
-      await axios.get("/api/users/logout", { withCredentials: true });
+      await axios.post("/api/auth/logout", { withCredentials: true });
       localStorage.clear();
       navigate("/login");
     } catch (err) {
@@ -210,15 +210,25 @@ const EmployeeDashboard = () => {
                     }
                   }}
                   isDisabled={task.status === "completed"}
-                  bg="gray.500" 
-                  color="black"
-                  variant={"filled"}
-                  fontWeight={"semibold"}
+                  bg="gray.700"
+                  color="white"
+                  borderColor="gray.600"
+                  variant="filled"
+                  fontWeight="semibold"
+                  _focus={{ bg: "gray.700", color: "white" }}
+                  _hover={{ bg: "gray.700", color: "white" }}
                 >
                   {["todo", "in-progress", "paused", "resume", "ready-for-review", "completed"].map((s) => (
-                    <option key={s} value={s}>{s}</option>
+                    <option
+                      key={s}
+                      value={s}
+                      style={{ background: "#2D3748", color: "white" }}
+                    >
+                      {s}
+                    </option>
                   ))}
                 </Select>
+
               </Box>
               <Divider/>
               <Text fontWeight={"bold"}>Description:</Text>
@@ -252,6 +262,11 @@ const EmployeeDashboard = () => {
                 {pauseReasons.hasOwnProperty(task._id) ? (
                   <Select
                     size="sm"
+                    bg="gray.700"
+                    color="white"
+                    borderColor="gray.600"
+                    _focus={{ bg: "gray.700", color: "white" }}
+                    _hover={{ bg: "gray.700", color: "white" }}
                     value={pauseReasons[task._id]}
                     onChange={(e) => {
                       const reason = e.target.value;
@@ -264,9 +279,17 @@ const EmployeeDashboard = () => {
                       }
                     }}
                   >
-                    <option value="">Select reason</option>
+                    <option style={{ background: "#2D3748", color: "white" }} value="">
+                      Select reason
+                    </option>
                     {["system error", "break", "shift ended", "meeting"].map(reason => (
-                      <option key={reason} value={reason}>{reason}</option>
+                      <option
+                        key={reason}
+                        value={reason}
+                        style={{ background: "#2D3748", color: "white" }}
+                      >
+                        {reason}
+                      </option>
                     ))}
                   </Select>
                 ) : task.status === "paused" ? (

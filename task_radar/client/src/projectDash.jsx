@@ -119,7 +119,16 @@ const handleRemoveEmployee = async (empId) => {
         <HStack spacing={4}>
           <Text fontSize="xl" fontWeight="bold">LOGO</Text>
           <Divider orientation="vertical" height="30px" />
-          <Text fontSize="md">Admin Dashboard</Text>
+          <Text
+            fontSize="md"
+            fontWeight="bold"
+            color="teal.200"
+            cursor="pointer"
+            _hover={{ textDecoration: "underline", color: "teal.300" }}
+            onClick={() => navigate('/adminDash')}
+          >
+            Admin Dashboard
+          </Text>
         </HStack>
         <HStack spacing={4}>
           <Avatar name={adminName} />
