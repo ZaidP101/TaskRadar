@@ -18,6 +18,8 @@
   } from "@chakra-ui/react";
   import { FiLogOut, FiEdit, FiSettings, FiTrash2  } from "react-icons/fi";
   import { AddIcon } from '@chakra-ui/icons';
+  import DonutChart from "./charts/DonutChart";
+
 
   const AdminDashboard = () => {
     const [employees, setEmployees] = useState([]);
@@ -313,7 +315,14 @@
           </Box>
 
         </Flex>
+        <Box mb={8} maxW="400px">
+            <DonutChart
+              ongoing={projects.filter(p => p.status === 'ongoing').length}
+              completed={projects.filter(p => p.status === 'completed').length}
+            />
+          </Box>
       </Flex>
+      
     );
   };
 

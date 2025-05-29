@@ -201,7 +201,10 @@ const handleRemoveEmployee = async (empId) => {
 
         {/* Center - Task Board */}
         <Box flex="1" p={4} overflowY="auto" bg="gray.700">
-          <Heading size="md" mb={3}>Task Board</Heading>
+          <Heading size="md" mb={3}>
+            {project ? project.name : "Loading..."}
+          </Heading>
+
           <Divider marginBottom={5}/>
           {tasks.length === 0 ? (
             <Text>No tasks found.</Text>
