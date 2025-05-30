@@ -19,7 +19,7 @@ import {
   Divider,
   IconButton
 } from "@chakra-ui/react";
-import { FiLogOut, FiEdit, FiSettings } from "react-icons/fi";
+import { FiLogOut, FiEdit, FiSettings, FiBarChart2 } from "react-icons/fi";
 
 const EmployeeDashboard = () => {
   const { projectId: paramProjectId, employeeId } = useParams();
@@ -139,37 +139,48 @@ const EmployeeDashboard = () => {
         <Box w="250px" p={4} bg="gray.600" overflowY="auto" margin={2} borderRadius={"md"}>
           <Heading size="sm" mb={4}>Project Members</Heading>
           <VStack align="start" spacing={4}>
-{employees.map(emp => {
-  console.log(employees); // Debug output
-  return (
-    <HStack key={emp._id}>
-      <Avatar size="sm" name={emp.name || emp.email} />
-      <Box>
-        <Text
-          fontWeight="bold"
-          color={
-            emp.status === "busy"
-              ? "red.500"
-              : emp.status === "free"
-              ? "green.500"
-              : "gray.500"
-          }
-        >
-          {emp.name || emp.email}
-        </Text>
-      </Box>
-    </HStack>
-  );
-})}
+            {employees.map(emp => {
+              console.log(employees); // Debug output
+              return (
+                <HStack key={emp._id}>
+                  <Avatar size="sm" name={emp.name || emp.email} />
+                  <Box>
+                    <Text
+                      fontWeight="bold"
+                      color={
+                        emp.status === "busy"
+                          ? "red.500"
+                          : emp.status === "free"
+                          ? "green.500"
+                          : "gray.500"
+                      }
+                    >
+                      {emp.name || emp.email}
+                    </Text>
+                  </Box>
+                </HStack>
+              );
+            })}
           </VStack>
         </Box>
 
         {/* Task Board */}
             <Box flex="1" p={4} overflowY="auto" bg="gray.700">
-  <Heading size="md" mb={3}>Task Board</Heading>
-  {tasks.length === 0 ? (
-    <Text>No tasks found.</Text>
-  ) : (
+               <Flex align="center" justify="space-between" mb={3}>
+                  <Heading size="md">Task Board</Heading>
+                  <IconButton
+                    icon={<FiBarChart2 />}
+                    aria-label="Task Analysis"
+                    size="md"
+                    _hover={{ bg: "white.600", transform: "scale(1.1)" }}
+                    _active={{ bg: "white.700" }}
+                    color="purple"
+                    onClick={() => navigate('/emp-analysis')}
+                  />
+                </Flex>
+              {tasks.length === 0 ? (
+              <Text>No tasks found.</Text>
+              ) : (
     <SimpleGrid columns={[1, 2, 3]} spacing={4}>
       {tasks.map((task) => {
         const deadline = new Date(task.deadline);

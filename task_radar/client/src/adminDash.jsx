@@ -16,9 +16,9 @@
     Button,
     Select,
   } from "@chakra-ui/react";
-  import { FiLogOut, FiEdit, FiSettings, FiTrash2  } from "react-icons/fi";
+  import { FiLogOut, FiEdit, FiSettings, FiTrash2, FiBarChart2 } from "react-icons/fi";
   import { AddIcon } from '@chakra-ui/icons';
-  import DonutChart from "./charts/DonutChart";
+  // import DonutChart from "./charts/DonutChart";
 
 
   const AdminDashboard = () => {
@@ -207,7 +207,18 @@
 
           {/* Right Side - Projects */}
           <Box flex="1" p={4} overflowY="auto" bg="gray.700">
-            <Heading size="md" mb={3} marginBottom={4}>Projects</Heading>
+            <Flex align="center" justify="space-between" mb={4}>
+              <Heading size="md">Projects</Heading>
+              <IconButton
+                icon={<FiBarChart2 />}
+                aria-label="Project Analysis"
+                size="md"
+                 _hover={{ bg: "white.600", transform: "scale(1.1)" }}
+                 _active={{ bg: "white.700" }}
+                color="purple"  
+                onClick={() => navigate('/project-analysis')}
+              />
+            </Flex>
             <Divider marginBottom={5}/>
             {projects.length === 0 ? (
               <Text>No projects found.</Text>
@@ -315,12 +326,12 @@
           </Box>
 
         </Flex>
-        <Box mb={8} maxW="400px">
+        {/* <Box mb={8} maxW="400px">
             <DonutChart
               ongoing={projects.filter(p => p.status === 'ongoing').length}
               completed={projects.filter(p => p.status === 'completed').length}
             />
-          </Box>
+          </Box> */}
       </Flex>
       
     );

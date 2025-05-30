@@ -16,7 +16,7 @@ import {
   Badge,
   Button
 } from "@chakra-ui/react";
-import { FiLogOut, FiEdit, FiSettings, FiTrash2 } from "react-icons/fi";
+import { FiLogOut, FiEdit, FiSettings, FiTrash2, FiBarChart2 } from "react-icons/fi";
 import { AddIcon } from "@chakra-ui/icons";
 
 
@@ -201,9 +201,21 @@ const handleRemoveEmployee = async (empId) => {
 
         {/* Center - Task Board */}
         <Box flex="1" p={4} overflowY="auto" bg="gray.700">
-          <Heading size="md" mb={3}>
-            {project ? project.name : "Loading..."}
-          </Heading>
+          <Flex align="center" justify="space-between" mb={3}>
+            <Heading size="md">
+              {project ? project.name : "Loading..."}
+            </Heading>
+            <IconButton
+              icon={<FiBarChart2 />}
+              aria-label="Project Analysis"
+              size="md"
+              _hover={{ bg: "white.600", transform: "scale(1.1)" }}
+              _active={{ bg: "white.700" }}
+              color="purple"
+              onClick={() => navigate('/task-analysis')}
+            />
+          </Flex>
+
 
           <Divider marginBottom={5}/>
           {tasks.length === 0 ? (

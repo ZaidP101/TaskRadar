@@ -13,6 +13,9 @@ import CreateProject from './createProject.jsx';
 import CreateTask from './createTask.jsx';
 import ChangePassword from './changePass.jsx';
 import UpdateAccount from './UpdateAccount.jsx';
+import ProjectAnalysis from './analysis/main_analysis/ProjectAnalysis.jsx';
+import TaskAnalysis from './analysis/p_analysis/TaskAnalysis.jsx';
+import EmployeeAnalysis from './analysis/e_analysis/EmployeeAnalysis.jsx';
 
 
 function App() {
@@ -33,6 +36,9 @@ function App() {
         <Route path="/project-dashboard/:projectId/create-task" element={<CreateTask />} />
         <Route path="/update-account" element={<UpdateAccount />} />
         <Route path="/change-password" element={<ChangePassword />} />
+        <Route path="/project-analysis" element={<ProjectAnalysis />} />
+        <Route path="/task-analysis" element={<TaskAnalysis />} />
+        <Route path="/emp-analysis" element={<EmployeeAnalysis />} />
       </Routes>
     </Router>
   );
