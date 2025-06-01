@@ -18,6 +18,7 @@
   } from "@chakra-ui/react";
   import { FiLogOut, FiEdit, FiSettings, FiTrash2, FiBarChart2 } from "react-icons/fi";
   import { AddIcon } from '@chakra-ui/icons';
+import LoadingScreen from "./Loader";
   // import DonutChart from "./charts/DonutChart";
 
 
@@ -106,7 +107,7 @@
       fetchData();
     }, []);
 
-    if (loading) return <Text p={4}>Loading Admin Dashboard...</Text>;
+   if (loading) return <LoadingScreen />;
 
     return (
       <Flex direction="column" height="100vh" color={"white"}>
@@ -224,7 +225,9 @@
                  _hover={{ bg: "white.600", transform: "scale(1.1)" }}
                  _active={{ bg: "white.700" }}
                 color="purple"  
-                onClick={() => navigate('/project-analysis')}
+                onClick={() => {navigate('/project-analysis');
+                    setLoading(true);
+                }}
               />
             </Flex>
             <Divider marginBottom={5}/>

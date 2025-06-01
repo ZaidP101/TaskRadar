@@ -20,6 +20,7 @@ import {
   IconButton
 } from "@chakra-ui/react";
 import { FiLogOut, FiEdit, FiSettings, FiBarChart2 } from "react-icons/fi";
+import LoadingScreen from "./Loader";
 
 const EmployeeDashboard = () => {
   const { projectId: paramProjectId, employeeId } = useParams();
@@ -102,7 +103,7 @@ const EmployeeDashboard = () => {
     }
   }, [effectiveProjectId]);
 
-  if (loading) return <Text p={4}>Loading Dashboard...</Text>;
+ if (loading) return <LoadingScreen />;
 
   return (
     <Flex direction="column" height="100vh" >
@@ -175,7 +176,9 @@ const EmployeeDashboard = () => {
                     _hover={{ bg: "white.600", transform: "scale(1.1)" }}
                     _active={{ bg: "white.700" }}
                     color="purple"
-                    onClick={() => navigate('/emp-analysis')}
+                    onClick={() => navigate(`/employee-analysis/${paramProjectId}/${employeeId}`, {
+                      state: {name,email,status,paramProjectId}
+                    })}
                   />
                 </Flex>
               {tasks.length === 0 ? (

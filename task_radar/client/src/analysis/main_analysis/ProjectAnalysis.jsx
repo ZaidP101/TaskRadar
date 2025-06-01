@@ -20,6 +20,7 @@ import TaskInProjectChart from './charts/TaskInProjectChart';
 import ProjectCreatedByAdminPolar from './charts/projByAdmin';
 import TotalEmp from './charts/totalEmps';
 import ProjectsByStatus from './charts/totalProj';
+import LoadingScreen from '../../Loader';
 
 const ProjectAnalysis = () => {
   const [employees, setEmployees] = useState([]);
@@ -67,7 +68,7 @@ const ProjectAnalysis = () => {
     }
   };
 
-  if (loading) return <Text p={4}>Loading Project Analysis...</Text>;
+  if (loading) return <LoadingScreen/>;
 
   return (
     <Flex direction="column" height="100vh" color="white">

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
-import axios from "axios";
+import axios from "../../axios";
 import {
   Box,
   Text,
@@ -11,49 +11,51 @@ import {
   Avatar,
   Divider,
   IconButton,
-  Tooltip,
+  SimpleGrid,
 } from "@chakra-ui/react";
 import { FiLogOut, FiEdit, FiSettings } from "react-icons/fi";
+import LoadingScreen from "../../Loader";
+import TotalTaskComp from "./p_charts/taskComp";
+import TaskStatus from "./p_charts/taskStatus";
+import Priority from "./p_charts/priority";
+import TaskByAdmin from "../e_analysis/e_charts/taskByAdmin";
+import TaskByTime from "./p_charts/taskByTime";
+import EmployeeStatus from "./p_charts/totalEmp";
 
 const TaskAnalysis = () => {
   const { projectId } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const { adminName, adminEmail } = location.state || {};
+ const adminInfoFromStorage = JSON.parse(localStorage.getItem("adminInfo")) || {};
+const { adminName, adminEmail, avatar } = location.state || {
+  adminName: adminInfoFromStorage.name,
+  adminEmail: adminInfoFromStorage.email,
+  avatar: adminInfoFromStorage.avatar
+};
 
   const [project, setProject] = useState(null);
   const [employees, setEmployees] = useState([]);
-  const [allEmployees, setAllEmployees] = useState([]);
+  const [tasks, setTasks] = useState([]); 
   const [loading, setLoading] = useState(true);
 
-  const fetchProjectData = async () => {
-    try {
-      const res = await axios.get(`/api/project/${projectId}`, {
-        withCredentials: true,
-      });
-      setProject(res.data.project || {});
-      setEmployees(res.data.project.employees || []);
-    } catch (err) {
-      console.error("Error fetching project:", err.response?.data || err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchAllEmployees = async () => {
-    try {
-      const res = await axios.get("/api/project/employees", {
-        withCredentials: true,
-      });
-      setAllEmployees(res.data.data || []);
-    } catch {
-      setAllEmployees([]);
-    }
-  };
-
+  
   useEffect(() => {
+    const fetchProjectData = async () => {
+      try {
+        const [projectRes, tasksRes] = await Promise.all([
+          axios.get(`/api/project/${projectId}`, { withCredentials: true }),
+          axios.get(`/api/task/project/${projectId}`, { withCredentials: true }),
+        ]);
+        setProject(projectRes.data.project || {});
+        setEmployees(projectRes.data.project.employees || []);
+        setTasks(tasksRes.data.data || []); // <-- SET TASKS HERE
+      } catch (err) {
+        console.error("Error fetching project or tasks:", err.response?.data || err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchProjectData();
-    fetchAllEmployees();
   }, [projectId]);
 
   const handleLogout = async () => {
@@ -66,39 +68,7 @@ const TaskAnalysis = () => {
     }
   };
 
-  const handleAddEmployee = async (empId) => {
-    try {
-      await axios.post(
-        "/api/project/add-employees",
-        {
-          projectId,
-          employees: [empId],
-        },
-        { withCredentials: true }
-      );
-      fetchProjectData();
-    } catch (err) {
-      alert(err.response?.data?.message || "Failed to add employee");
-    }
-  };
-
-  const handleRemoveEmployee = async (empId) => {
-    try {
-      await axios.post(
-        "/api/project/remove-employees",
-        {
-          projectId,
-          employees: [empId],
-        },
-        { withCredentials: true }
-      );
-      fetchProjectData();
-    } catch (err) {
-      alert(err.response?.data?.message || "Failed to remove employee");
-    }
-  };
-
-  if (loading) return <Text p={4}>Loading Task Analysis...</Text>;
+  if (loading) return <LoadingScreen />;
 
   return (
     <Flex direction="column" height="100vh" color={"white"}>
@@ -133,42 +103,65 @@ const TaskAnalysis = () => {
       {/* Main Layout */}
       <Flex flex="1" overflow="hidden" bg={"gray.700"}>
         {/* Left Sidebar - Project Employees */}
-        <Box w="250px" p={4} bg="gray.600" overflowY="auto" margin={2} borderRadius={"md"}>
-            <Heading size="sm" mb={4}>Project Members</Heading>
-            <Divider marginBottom={3} />
-            <VStack align="start" spacing={4}>
-                {employees.length === 0 ? (
-                <Text color="gray.400" fontStyle="italic">No employees assigned to this project.</Text>
-                ) : (
-                employees.map(emp => (
-                    <HStack key={emp._id}>
-                    <Avatar size="sm" name={emp.name || emp.email} />
-                    <Box>
-                        <Text
-                        fontWeight="bold"
-                        color={
-                            emp.status === "busy"
-                            ? "red.500"
-                            : emp.status === "free"
-                            ? "green.500"
-                            : "gray.500"
-                        }
-                        >
-                        {emp.name || emp.email}
-                        </Text>
-                    </Box>
-                    </HStack>
-                ))
-                )}
-            </VStack>
+        <Box w="250px" p={4} bg="gray.600" overflowY="auto" m={2} borderRadius="md">
+          <Heading size="sm" mb={4}>Project Members</Heading>
+          <Divider mb={3} />
+          <VStack align="start" spacing={4}>
+            {employees.length === 0 ? (
+              <Text color="gray.400" fontStyle="italic">No employees assigned to this project.</Text>
+            ) : (
+              employees.map(emp => (
+                <HStack key={emp._id} width="100%">
+                  <Avatar
+                    size="sm"
+                    name={emp.name || emp.email}
+                    src={emp.avatar ? `data:image/jpeg;base64,${emp.avatar}` : undefined}
+                  />
+                  <Box>
+                    <Text
+                      fontWeight="bold"
+                      color={
+                        emp.status === "busy"
+                          ? "red.500"
+                          : emp.status === "free"
+                          ? "green.500"
+                          : "gray.500"
+                      }
+                    >
+                      {emp.name || emp.email}
+                    </Text>
+                  </Box>
+                </HStack>
+              ))
+            )}
+          </VStack>
         </Box>
 
-
         {/* Right Side - Task Analysis Content */}
-        <Box flex="1" p={4}>
-          {/* Add your Task Analysis components here */}
-          <Heading size="md" mb={4}>Task Analysis for Project</Heading>
-          {/* You can render charts, stats, tables etc. here */}
+        <Box flex="1" p={6} bg="gray.800" overflowY="auto">
+          <Heading size="lg" mb={6}>Project Analysis</Heading>
+          <SimpleGrid columns={[1, 1, 2, 3]} spacing={8}>
+            {/* Now tasks is defined and passed correctly! */}
+            <TotalTaskComp tasks={tasks} />
+            <TaskStatus tasks={tasks}/>
+            <Priority tasks={tasks}/>
+            <TaskByAdmin tasks={tasks}/>
+            <TaskByTime tasks={tasks}/>
+            <EmployeeStatus employees={employees}/>
+
+            <Box bg="gray.600" p={4} borderRadius="md" shadow="md" color="white" minH="260px">
+              <Heading size="sm" mb={4} textAlign="center">Stacked Bar Chart</Heading>
+              <Text textAlign="center" color="gray.300">Stacked bar chart goes here</Text>
+            </Box>
+            <Box bg="gray.600" p={4} borderRadius="md" shadow="md" color="white" minH="260px">
+              <Heading size="sm" mb={4} textAlign="center">Horizontal Bar Chart</Heading>
+              <Text textAlign="center" color="gray.300">Horizontal bar chart goes here</Text>
+            </Box>
+            <Box bg="gray.600" p={4} borderRadius="md" shadow="md" color="white" minH="260px">
+              <Heading size="sm" mb={4} textAlign="center">Radar Chart</Heading>
+              <Text textAlign="center" color="gray.300">Radar chart goes here</Text>
+            </Box>
+          </SimpleGrid>
         </Box>
       </Flex>
     </Flex>

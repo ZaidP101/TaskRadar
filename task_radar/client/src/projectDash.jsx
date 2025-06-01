@@ -18,12 +18,13 @@ import {
 } from "@chakra-ui/react";
 import { FiLogOut, FiEdit, FiSettings, FiTrash2, FiBarChart2 } from "react-icons/fi";
 import { AddIcon } from "@chakra-ui/icons";
+import LoadingScreen from "./Loader";
 
 
 const ProjectDashboard = () => {
-  const { projectId } = useParams();
-  const location = useLocation();
-  const navigate = useNavigate();
+const { projectId } = useParams();
+const location = useLocation();
+const navigate = useNavigate();
 const adminInfoFromStorage = JSON.parse(localStorage.getItem("adminInfo")) || {};
 const { adminName, adminEmail, avatar } = location.state || {
   adminName: adminInfoFromStorage.name,
@@ -115,7 +116,7 @@ const handleRemoveEmployee = async (empId) => {
 };
 
 
-  if (loading) return <Text p={4}>Loading Project Dashboard...</Text>;
+  if (loading) return <LoadingScreen/>;
 
   return (
     <Flex direction="column" height="100vh" color={"white"}>
@@ -218,15 +219,22 @@ const handleRemoveEmployee = async (empId) => {
             <Heading size="md">
               {project ? project.name : "Loading..."}
             </Heading>
-            <IconButton
-              icon={<FiBarChart2 />}
-              aria-label="Project Analysis"
-              size="md"
-              _hover={{ bg: "white.600", transform: "scale(1.1)" }}
-              _active={{ bg: "white.700" }}
-              color="purple"
-              onClick={() => navigate('/task-analysis')}
-            />
+             <IconButton
+                icon={<FiBarChart2 />}
+                aria-label="Project Analysis"
+                size="md"
+                _hover={{ bg: "white.600", transform: "scale(1.1)" }}
+                _active={{ bg: "white.700" }}
+                color="purple"
+                onClick={() => navigate(`/task-analysis/${project._id}`, {
+                  state: {
+                    // projectId: project._id,
+                    adminName,
+                    adminEmail,
+                    avatar,
+                  }
+                })}
+              />
           </Flex>
 
 

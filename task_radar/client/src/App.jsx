@@ -37,8 +37,8 @@ function App() {
         <Route path="/update-account" element={<UpdateAccount />} />
         <Route path="/change-password" element={<ChangePassword />} />
         <Route path="/project-analysis" element={<ProjectAnalysis />} />
-        <Route path="/task-analysis" element={<TaskAnalysis />} />
-        <Route path="/emp-analysis" element={<EmployeeAnalysis />} />
+        <Route path="/task-analysis/:projectId" element={<TaskAnalysis />} />
+        <Route path="/employee-analysis/:employeeId/:projectId" element={<EmployeeAnalysis />} />
       </Routes>
     </Router>
   );
