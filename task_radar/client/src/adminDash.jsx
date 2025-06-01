@@ -35,7 +35,7 @@
     } catch (e) {
       adminInfoFromStorage = {};
     }
-    const { name, email } = location.state || adminInfoFromStorage;
+    const { name, email, avatar } = location.state || adminInfoFromStorage;
     console.log(`name : ${name}, email ${email}`);
     
     const fetchData = async () => {
@@ -128,7 +128,10 @@
           </HStack>
 
           <HStack spacing={4}>
-            <Avatar name={name} />
+            <Avatar
+              name={name}
+              src={avatar ? `data:image/jpeg;base64,${avatar}` : undefined} 
+            />
             <Box textAlign="right">
               <Text fontWeight="bold">{name}</Text>
               <Text fontSize="sm">{email}</Text>
@@ -161,7 +164,8 @@
                           name: emp.name,
                           email: emp.email,
                           status: emp.status,
-                          projectId: emp.assignProjects,
+                          projectId: emp.assignProjects,//dfddddddddd
+                          avatar: emp.avatar,
                         },
                       });
                       localStorage.setItem("projectId", emp.assignProjects);
@@ -183,7 +187,11 @@
                       boxShadow: "md",
                     }}
                   >
-                    <Avatar size="sm" name={emp.name || emp.email} />
+                  <Avatar
+                    size="sm"
+                    name={emp.name || emp.email}
+                    src={emp.avatar ? `data:image/jpeg;base64,${emp.avatar}` : undefined}
+                  />
                     <Box>
                       <Text
                         fontWeight="bold"
@@ -284,6 +292,7 @@
                         state: {
                           adminName: name,
                           adminEmail: email,
+                          avatar: avatar,
                         }
                       })}
                     >

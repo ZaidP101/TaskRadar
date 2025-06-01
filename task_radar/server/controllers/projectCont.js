@@ -229,7 +229,7 @@ const getAllEmployees = asyncHandler(async (req, res) => {
         throw new ApiError(403, "Only Admins can view all employees.");
     }
 
-    const employees = await User.find({isAdmin:false}, "-password"); // exclude sensitive data
+    const employees = await User.find({isAdmin:false}, "-password"); 
     res.status(200).json(new ApiResponse(200, employees, "All employees fetched successfully."));
 });
 

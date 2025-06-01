@@ -133,6 +133,7 @@ const loginUser = asyncHandler(async(req, res)=>{
           isAdmin: loggedinUser.isAdmin,
           project: loggedinUser.assignProjects?._id || null,
           status: loggedinUser.status || 'free', // default fallback
+          avatar: loggedinUser.avatar || null,
         },
         accessToken,
         refreshToken,

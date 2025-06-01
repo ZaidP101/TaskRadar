@@ -24,7 +24,12 @@ const ProjectDashboard = () => {
   const { projectId } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const { adminName, adminEmail } = location.state || {};
+const adminInfoFromStorage = JSON.parse(localStorage.getItem("adminInfo")) || {};
+const { adminName, adminEmail, avatar } = location.state || {
+  adminName: adminInfoFromStorage.name,
+  adminEmail: adminInfoFromStorage.email,
+  avatar: adminInfoFromStorage.avatar
+};
 
   const [project, setProject] = useState(null);
   const [employees, setEmployees] = useState([]);
@@ -131,7 +136,11 @@ const handleRemoveEmployee = async (empId) => {
           </Text>
         </HStack>
         <HStack spacing={4}>
-          <Avatar name={adminName} />
+           <Avatar
+              name={adminName}
+              src={avatar ? `data:image/jpeg;base64,${avatar}` : undefined} // <-- FIXED: use avatar as image if present
+            />
+
           <Box textAlign="right">
             <Text fontWeight="bold">{adminName}</Text>
             <Text fontSize="sm">{adminEmail}</Text>
@@ -152,7 +161,11 @@ const handleRemoveEmployee = async (empId) => {
             {/* Employees in project */}
             {employees.map(emp => (
               <HStack key={emp._id}>
-                <Avatar size="sm" name={emp.name || emp.email} />
+                  <Avatar
+                    size="sm"
+                    name={emp.name || emp.email}
+                    src={emp.avatar ? `data:image/jpeg;base64,${emp.avatar}` : undefined}
+                  />
                 <Box>
                   <Text fontWeight="bold" color={
                     emp.status === "busy"

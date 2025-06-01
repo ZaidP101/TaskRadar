@@ -21,7 +21,7 @@ function Login() {
         { withCredentials: true }
       );
 
-      const { name, email: emailFromDB, isAdmin, project, status } = response?.data?.data?.user || {};
+      const { name, email: emailFromDB, isAdmin, project, status, avatar } = response?.data?.data?.user || {};
       if (isAdmin === undefined) {
       throw new Error("User data is missing in response.");
       }
@@ -29,14 +29,15 @@ function Login() {
       console.log()
       localStorage.setItem(
         "adminInfo",
-        JSON.stringify({ name, email: emailFromDB, status, isAdmin })
+        JSON.stringify({ name, email: emailFromDB, status, isAdmin, avatar })
       );
       // Route based on admin flag
       navigate(isAdmin ? '/adminDash' : `/empDash/${project}`, {
       state: {
-          name: name, // Pass the user's name
-          email: emailFromDB, // Pass the email
-          status: status, // Pass the status
+          name: name, 
+          email: emailFromDB, 
+          status: status,
+          avatar: avatar,
   },
       });
     } catch (error) {

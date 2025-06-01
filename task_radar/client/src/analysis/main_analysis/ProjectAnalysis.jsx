@@ -9,28 +9,34 @@ import {
   Divider,
   Heading,
   IconButton,
+  SimpleGrid,
 } from '@chakra-ui/react';
 import { FiEdit, FiSettings, FiLogOut } from 'react-icons/fi';
 import { useNavigate, useLocation } from 'react-router-dom';
-import axios from 'axios';
+import axios from "../../axios";
+import DonutChart from "./charts/DonutChart";
+import ProjectStatusBarChart from './charts/ProjectStatusBarChart';
+import TaskInProjectChart from './charts/TaskInProjectChart';
+import ProjectCreatedByAdminPolar from './charts/projByAdmin';
+import TotalEmp from './charts/totalEmps';
+import ProjectsByStatus from './charts/totalProj';
 
 const ProjectAnalysis = () => {
   const [employees, setEmployees] = useState([]);
-    const [projects, setProjects] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [selectedProject, setSelectedProject] = useState(null);
-    const navigate = useNavigate();
-    const location = useLocation();
-    // Try to get from location.state first, then fallback to localStorage
-    let adminInfoFromStorage = {};
-    try {
-      adminInfoFromStorage = JSON.parse(localStorage.getItem("adminInfo")) || {};
-    } catch (e) {
-      adminInfoFromStorage = {};
-    }
-    const { name, email } = location.state || adminInfoFromStorage;
-    console.log(`name : ${name}, email ${email}`);
-    
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  let adminInfoFromStorage = {};
+  try {
+    adminInfoFromStorage = JSON.parse(localStorage.getItem("adminInfo")) || {};
+  } catch (e) {
+    adminInfoFromStorage = {};
+  }
+  const { name, email } = location.state || adminInfoFromStorage;
+
+  useEffect(() => {
     const fetchData = async () => {
       try {
         const [empRes, projRes] = await Promise.all([
@@ -45,29 +51,23 @@ const ProjectAnalysis = () => {
         setLoading(false);
       }
     };
+    fetchData();
+  }, []);
 
-    const handleLogout = async () => {
-      try {
-        await axios.post("/api/auth/logout",{}, { withCredentials: true });
-        localStorage.clear();
-        navigate("/login");
-      } catch (err) {
-        console.error("Logout failed", err);
-      }
-    };
+  const ongoingCount = projects.filter(p => p.status === "ongoing").length;
+  const completedCount = projects.filter(p => p.status === "completed").length;
 
-    const handleAdminDashboardClick = () => {
-      navigate('/adminDash', { replace: true });
-      // If you want to force a full reload:
-      window.location.href = '/adminDash';
-    };
+  const handleLogout = async () => {
+    try {
+      await axios.post("/api/auth/logout", {}, { withCredentials: true });
+      localStorage.clear();
+      navigate("/login");
+    } catch (err) {
+      console.error("Logout failed", err);
+    }
+  };
 
-
-    useEffect(() => {
-      fetchData();
-    }, []);
-
-    if (loading) return <Text p={4}>Loading Admin Dashboard...</Text>;
+  if (loading) return <Text p={4}>Loading Project Analysis...</Text>;
 
   return (
     <Flex direction="column" height="100vh" color="white">
@@ -87,7 +87,6 @@ const ProjectAnalysis = () => {
             Admin Dashboard
           </Text>
         </HStack>
-
         <HStack spacing={4}>
           <Avatar name={name} />
           <Box textAlign="right">
@@ -107,8 +106,10 @@ const ProjectAnalysis = () => {
           <Heading size="sm" mb={4}>Employees</Heading>
           <Divider mb={3} />
           <VStack align="start" spacing={4}>
+            {employees.length === 0 && (
+              <Text color="gray.300">No employees found.</Text>
+            )}
             {employees.map(emp => (
-                
               <Box
                 as="button"
                 key={emp._id}
@@ -143,7 +144,11 @@ const ProjectAnalysis = () => {
                     boxShadow: "md",
                   }}
                 >
-                  <Avatar size="sm" name={emp.name || emp.email} />
+                  <Avatar
+                    size="sm"
+                    name={emp.name || emp.email}
+                    src={emp.avatar ? `data:image/jpeg;base64,${emp.avatar}` : undefined}
+                  />
                   <Box>
                     <Text
                       fontWeight="bold"
@@ -164,21 +169,30 @@ const ProjectAnalysis = () => {
           </VStack>
         </Box>
 
-        {/* Main Content - Charts Placeholder */}
+        {/* Main Content - Six Charts in 2 Rows of 3 */}
         <Box flex="1" p={6} bg="gray.800" overflowY="auto">
-          <Heading size="lg" mb={4}>Project Analysis</Heading>
-          <Box
-            mt={4}
-            p={6}
-            bg="gray.900"
-            borderRadius="md"
-            boxShadow="md"
-            height="300px"
-          >
-            <Text textAlign="center" color="gray.400">
-              Charts and analytics will appear here.
-            </Text>
-          </Box>
+          <Heading size="lg" mb={6}>Project Analysis</Heading>
+          <SimpleGrid columns={[1, 1, 2, 3]} spacing={8}>
+           
+            <DonutChart ongoing={ongoingCount} completed={completedCount} />
+            <ProjectStatusBarChart projects={projects}/>
+            <TaskInProjectChart projects={projects}/>
+            <ProjectCreatedByAdminPolar projects={projects}/>
+            <TotalEmp projects={projects}/>
+            <ProjectsByStatus projects={projects}/>
+            <Box bg="gray.600" p={4} borderRadius="md" shadow="md" color="white" minH="260px">
+              <Heading size="sm" mb={4} textAlign="center">Stacked Bar Chart</Heading>
+              <Text textAlign="center" color="gray.300">Stacked bar chart goes here</Text>
+            </Box>
+            <Box bg="gray.600" p={4} borderRadius="md" shadow="md" color="white" minH="260px">
+              <Heading size="sm" mb={4} textAlign="center">Horizontal Bar Chart</Heading>
+              <Text textAlign="center" color="gray.300">Horizontal bar chart goes here</Text>
+            </Box>
+            <Box bg="gray.600" p={4} borderRadius="md" shadow="md" color="white" minH="260px">
+              <Heading size="sm" mb={4} textAlign="center">Radar Chart</Heading>
+              <Text textAlign="center" color="gray.300">Radar chart goes here</Text>
+            </Box>
+          </SimpleGrid>
         </Box>
       </Flex>
     </Flex>

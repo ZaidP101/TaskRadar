@@ -37,7 +37,7 @@ const DonutChart = ({ ongoing, completed }) => {
   };
 
   return (
-    <Box bg="gray.600" p={4} borderRadius="md" shadow="md" color="white">
+    <Box bg="gray.700" p={4} borderRadius="md" shadow="md" color="white">
       <Heading size="sm" mb={4} textAlign="center">
         Project Status Distribution
       </Heading>
