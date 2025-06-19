@@ -16,6 +16,42 @@
 
 ---
 
+## Feature Preview
+
+### 1. Landing Page
+![Landing Page](./task_radar/client/public/TR!.png)
+
+### 2. NavBar Info Pages
+![NavBar Info Pages](./task_radar/client/public/TR1.png)
+
+### 3. Admin Dashboard
+![Admin Dashboard](./task_radar/client/public/TRA1.png)
+
+### 4. Project Analytics Overview
+![Project Analytics Overview](./task_radar/client/public/TRA2.png)
+
+### 5. Project Creation
+![Project Creation](./task_radar/client/public/TRA3.png)
+
+### 6. Particular Project Dashboard
+![Particular Project Dashboard](./task_radar/client/public/TRAP1.png)
+
+### 7. Particular Project Analytics
+![Particular Project Analytics](./task_radar/client/public/TRAP2.png)
+
+### 8. Task Creation
+![Task Creation](./task_radar/client/public/TRAP3.png)
+
+### 9. Employee Dashboard
+![Employee Dashboard](./task_radar/client/public/TRE1.png)
+
+### 10. Employee Analytics
+![Employee Analytics](./task_radar/client/public/TRE2.png)
+
+
+
+---
+
 ## Statuses and Priorities
 
 ### Project Statuses
