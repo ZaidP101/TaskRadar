@@ -115,17 +115,13 @@ Task time tracking is a core feature of TaskRadar:
 Backend And Frontend
 ```bash
 git clone https://github.com/yourusername/TaskRadar.git
-cd TaskRadar\task_radar\client
-npm install
-cd ..
-cd TaskRadar\task_radar\server
-npm install
+cd TaskRadar\task_radar
+docker compose up --build
 ```
-### Start the backend server and frontend:
+Stopping the App
 ```bash
-npm run dev
+docker compose down
 ```
-
 ## Usage
 
 - Register as an **Admin** or **Employee**.

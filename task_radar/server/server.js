@@ -15,9 +15,14 @@ app.get('/', (req,res) =>{
     res.send("hello zaid ")
 });
 
+app.get('/health', (req, res) => {    // added for docker-copose.yml
+  res.status(200).json({ status: 'ok' });
+}); 
+
+
 const port = process.env.PORT || 5000;
 
-app.listen(port,()=>{
+app.listen(port,'0.0.0.0', ()=>{
     console.log(`Server started at http://localhost:${port}`);
 })
 

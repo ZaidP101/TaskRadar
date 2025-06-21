@@ -1,0 +1,44 @@
+version : "3.8"
+
+services: 
+  server:
+    container_name: tr_server
+    build: ./server
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./server/.env
+    volumes:
+      - ./server:/app       # through path
+      - tr_vol:/app/node_modules # custome made
+    networks:
+      - tr_Net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  client:
+    build: ./client
+    container_name: tr_client
+    ports:
+      - "5173:5173"
+    # volumes:
+    #   - ./client:/app
+    #   - tr_vol:/app/node_modules
+    networks:
+      - tr_Net
+    environment:
+      - VITE_API_BASE_URL=http://server:3000
+    depends_on: 
+      - server
+
+networks:
+  tr_Net:
+    external: true  # use of pre-created Docker network
+
+volumes:
+  tr_vol:
+    external: true  # use of pre-created Docker volume
